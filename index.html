@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Math Solution</title>
+  <style>
+    :root {
+      --bg: #000000;
+      --card: #111111;
+      --text: #ffffff;
+      --muted: #b3b3b3;
+      --green: #00C853;
+      --green-text: #000000;
+      --border: #262626;
+      --input-bg: #ffffff;
+      --input-text: #111111;
+    }
+
+    body.light-mode {
+      --bg: #f5f5f5;
+      --card: #ffffff;
+      --text: #111111;
+      --muted: #555555;
+      --border: #dcdcdc;
+      --input-bg: #ffffff;
+      --input-text: #111111;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", Tahoma, Arial, sans-serif;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .ltr {
+      direction: ltr;
+      unicode-bidi: isolate;
+      text-align: left;
+    }
+
+    .rtl {
+      direction: rtl;
+      unicode-bidi: isolate;
+      text-align: right;
+    }
+
+    /* Navbar */
+    .navbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--text);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .mode-btn {
+      background: var(--green);
+      color: var(--green-text);
+      border: none;
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      font-size: 0.95rem;
+    }
+
+    .nav-links a {
+      color: var(--text);
+      text-decoration: none;
+      opacity: 0.9;
+    }
+
+    .nav-links a:hover {
+      color: var(--green);
+    }
+
+    /* Container */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 28px 16px 60px;
+    }
+
+    .hero-title {
+      text-align: center;
+      font-size: 1.7rem;
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+
+    .green-banner {
+      background: var(--green);
+      color: #000000;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-weight: 700;
+      margin-bottom: 22px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      text-align: center;
+    }
+
+    .section-label {
+      font-size: 0.92rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .pill-btn {
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 8px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .pill-btn.active {
+      background: var(--green);
+      color: #000000;
+      border-color: var(--green);
+    }
+
+    /* Main Solver Card */
+    .solver-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      margin-top: 12px;
+    }
+
+    .top-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .action-green {
+      background: var(--green);
+      color: #000000;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .action-yellow {
+      background: #ffd600;
+      color: #000000;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .action-dark {
+      background: #1f1f1f;
+      color: #ffffff;
+      border: 1px solid #383838;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .box-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 0.92rem;
+      color: var(--muted);
+    }
+
+    textarea.exercise-input {
+      width: 100%;
+      min-height: 110px;
+      background: var(--input-bg);
+      color: var(--input-text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 1rem;
+      resize: vertical;
+    }
+
+    .submit-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .result-box {
+      margin-top: 18px;
+      padding: 16px;
+      border-radius: 10px;
+      border: 1px solid var(--green);
+      background: rgba(0, 200, 83, 0.08);
+      display: none;
+    }
+
+    .footer-help {
+      margin-top: 32px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .help-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .help-input {
+      flex: 1;
+      min-width: 220px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--input-bg);
+      color: var(--input-text);
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="brand-group">
+      <div class="brand-title" id="brandLogo">Math Solution</div>
+      <button type="button" class="mode-btn" id="modeToggle">Mode Clair</button>
+    </div>
+    <div class="nav-links">
+      <a href="#top">الرئيسية</a>
+      <a href="#subjects">المواضيع</a>
+      <a href="#history">السجل</a>
+      <a href="#photo">صور المسألة</a>
+    </div>
+  </nav>
+
+  <main class="container" id="top">
+    <h1 class="hero-title" id="heroTitle">صوّر تمرين الرياضيات ولا كتبو، وخد الحل خطوة بخطوة مع التحقق النهائي</h1>
+
+    <div class="green-banner">
+      <span class="rtl">5 أسئلة مجانية بلا كود -</span>
+      <span class="ltr">1ère, 2ème, 3ème année collège, Tronc Commun - الجذع المشترك, Tronc Commun Scientifique, 1ère et 2ème année Bac - résolution claire étape par étape avec vérification finale.</span>
+    </div>
+
+    <div id="subjects">
+      <div class="section-label">المادة</div>
+      <div class="pill-row" id="subjectButtons">
+        <button type="button" class="pill-btn active" data-subject="math">Mathématiques</button>
+        <button type="button" class="pill-btn" data-subject="physique">Physique</button>
+        <button type="button" class="pill-btn" data-subject="chimie">Chimie</button>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">المستوى الدراسي</div>
+      <div class="pill-row ltr" id="levelButtons">
+        <button type="button" class="pill-btn active" data-level="1ère année collège">1ère année collège</button>
+        <button type="button" class="pill-btn" data-level="2ème année collège">2ème année collège</button>
+        <button type="button" class="pill-btn" data-level="3ème année collège">3ème année collège</button>
+        <button type="button" class="pill-btn" data-level="Tronc Commun - الجذع المشترك, Tronc Commun Scientifique">Tronc Commun - الجذع المشترك, Tronc Commun Scientifique</button>
+        <button type="button" class="pill-btn" data-level="1ère année Bac">1ère année Bac</button>
+        <button type="button" class="pill-btn" data-level="2ème année Bac">2ème année Bac</button>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">اختر لغة الشرح</div>
+      <div class="pill-row" id="langButtons">
+        <button type="button" class="pill-btn active" data-lang="darija">بالدارجة</button>
+        <button type="button" class="pill-btn" data-lang="ar">العربية الفصحى</button>
+        <button type="button" class="pill-btn" data-lang="fr">Français</button>
+        <button type="button" class="pill-btn" data-lang="ar-fr">العربية + FR</button>
+      </div>
+    </div>
+
+    <section class="solver-card" id="photo">
+      <div class="top-actions">
+        <button type="button" class="action-green" id="cameraBtn">Prendre une photo</button>
+        <button type="button" class="action-yellow" id="imageBtn">Choisir une image</button>
+        <button type="button" class="action-dark" id="examBtn">جبد الامتحان من التيليفون</button>
+        <input type="file" id="fileInput" accept="image/*" style="display:none" />
+      </div>
+
+      <div class="box-header">
+        <span class="ltr">Écrire l'exercice</span>
+        <span class="rtl">ولا كتب التمرين هنا مباشرة ✏️</span>
+      </div>
+
+      <textarea
+        id="exerciseInput"
+        class="exercise-input"
+        placeholder="مثال: عندي 50 درهم تريت كتاب ب 20 درهم شحال بقا ليا؟ أو 3x - 7 = 2x + 5"
+      ></textarea>
+
+      <div class="submit-row">
+        <button type="button" class="action-green" id="solveBtn">حل التمرين</button>
+        <button type="button" class="action-yellow" id="exampleBtn">جرب مثال</button>
+      </div>
+
+      <div class="result-box" id="resultBox"></div>
+    </section>
+
+    <section class="footer-help" id="history">
+      <h3>عندك مشكل فالموقع؟</h3>
+      <div class="help-row">
+        <input type="text" id="issueInput" class="help-input" placeholder="اكتب المشكل ديالك هنا..." />
+        <button type="button" class="action-green" id="sendIssueBtn">صيفط المشكل</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    let selectedSubject = 'math';
+    let selectedLevel = '1ère année collège';
+    let selectedLang = 'darija';
+
+    const heroTitles = {
+      math: 'صوّر تمرين الرياضيات ولا كتبو، وخد الحل خطوة بخطوة مع التحقق النهائي',
+      physique: 'صوّر تمرين الفيزياء ولا كتبو، وخد الحل خطوة بخطوة مع التحقق النهائي',
+      chimie: 'صوّر تمرين الكيمياء ولا كتبو، وخد الحل خطوة بخطوة مع التحقق النهائي'
+    };
+
+    const modeToggle = document.getElementById('modeToggle');
+    modeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('light-mode');
+      modeToggle.textContent = document.body.classList.contains('light-mode') ? 'Mode Sombre' : 'Mode Clair';
+    });
+
+    function setupGroup(containerId, onSelect) {
+      const container = document.getElementById(containerId);
+      container.addEventListener('click', (e) => {
+        const btn = e.target.closest('button.pill-btn');
+        if (!btn) return;
+        container.querySelectorAll('button.pill-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        onSelect(btn);
+      });
+    }
+
+    setupGroup('subjectButtons', (btn) => {
+      selectedSubject = btn.dataset.subject;
+      document.getElementById('heroTitle').textContent = heroTitles[selectedSubject];
+    });
+
+    setupGroup('levelButtons', (btn) => {
+      selectedLevel = btn.dataset.level;
+    });
+
+    setupGroup('langButtons', (btn) => {
+      selectedLang = btn.dataset.lang;
+    });
+
+    const exerciseInput = document.getElementById('exerciseInput');
+    const resultBox = document.getElementById('resultBox');
+
+    document.getElementById('exampleBtn').addEventListener('click', () => {
+      if (selectedSubject === 'math') {
+        exerciseInput.value = '3x - 7 = 2x + 5';
+      } else if (selectedSubject === 'physique') {
+        exerciseInput.value = 'd = 120 m, t = 20 s -> v = ?';
+      } else {
+        exerciseInput.value = 'H2 + O2 -> H2O';
+      }
+    });
+
+    document.getElementById('solveBtn').addEventListener('click', () => {
+      const text = exerciseInput.value.trim();
+      resultBox.style.display = 'block';
+      if (!text) {
+        resultBox.innerHTML = '<div class="rtl">عاود كتب المسألة بهاد الشكل: عندي ... شريت ... شحال بقا ليا؟</div>';
+        return;
+      }
+      resultBox.innerHTML = `
+        <div class="rtl"><strong>الواجهة مفعلة بنجاح</strong> — المادة المختارة: ${selectedSubject} | المستوى: ${selectedLevel} | اللغة: ${selectedLang}</div>
+        <div class="ltr" style="margin-top:8px;">Exercice: ${text.replace(/</g, '&lt;')}</div>
+        <div class="rtl" style="margin-top:8px;">التحقق النهائي: جاهز لربط محرك الحل خطوة بخطوة في المرحلة القادمة.</div>
+      `;
+    });
+
+    const fileInput = document.getElementById('fileInput');
+    document.getElementById('cameraBtn').addEventListener('click', () => {
+      fileInput.setAttribute('capture', 'environment');
+      fileInput.click();
+    });
+    document.getElementById('imageBtn').addEventListener('click', () => {
+      fileInput.removeAttribute('capture');
+      fileInput.click();
+    });
+    document.getElementById('examBtn').addEventListener('click', () => {
+      fileInput.removeAttribute('capture');
+      fileInput.click();
+    });
+
+    document.getElementById('sendIssueBtn').addEventListener('click', () => {
+      const issue = document.getElementById('issueInput').value.trim();
+      const msg = encodeURIComponent(issue || 'عندي مشكل فالموقع Math Solution');
+      window.open(`https://wa.me/212679931143?text=${msg}`, '_blank', 'noopener,noreferrer');
+    });
+  </script>
+</body>
+</html>
