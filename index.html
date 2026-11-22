@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Math Solution</title>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <style>
     :root {
       --bg: #050505;
@@ -336,4 +335,645 @@
 
     .audio-controls {
       display: flex;
-      flex-wrap:
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .btn-audio {
+      background: var(--green);
+      color: #000000;
+      border: none;
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .btn-audio.secondary {
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--green);
+    }
+
+    .voice-hint {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .question-block {
+      margin-bottom: 16px;
+      padding: 14px;
+      background: var(--surface);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    .question-heading {
+      color: var(--green);
+      font-weight: 800;
+      margin-bottom: 8px;
+      font-size: 1rem;
+    }
+
+    .step-item {
+      margin-bottom: 8px;
+      padding: 8px 12px;
+      background: var(--bg);
+      border-radius: 8px;
+      border-right: 3px solid var(--green);
+      font-size: 0.94rem;
+    }
+
+    .reexplain-link {
+      display: inline-block;
+      margin-top: 12px;
+      color: var(--yellow);
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: underline;
+      font-size: 0.95rem;
+    }
+
+    .simple-box {
+      margin-top: 12px;
+      padding: 14px;
+      background: rgba(255, 214, 0, 0.1);
+      border: 1px solid var(--yellow);
+      border-radius: 10px;
+      display: none;
+    }
+
+    .sub-box, .owner-panel, .help-box {
+      margin-top: 20px;
+      padding: 16px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    .inline-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .text-field {
+      flex: 1;
+      min-width: 180px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-right">
+      <div class="brand-logo" id="secretOwnerTrigger"><span>Math</span> Solution</div>
+      <button type="button" class="mode-pill" id="modeToggle">Mode Clair ☀️</button>
+    </div>
+
+    <div class="nav-links">
+      <a href="#top" class="active">الرئيسية</a>
+      <a href="#levels">المواضيع</a>
+      <a href="#solutionBox">السجل</a>
+    </div>
+
+    <div class="nav-left">
+      <button type="button" class="btn-photo-nav" id="navPhotoBtn">📷 صور المسألة</button>
+    </div>
+  </nav>
+
+  <div class="main-wrapper" id="top">
+    <div class="sub-caption">اختر المادة الرئيسية - <span class="ltr">Choisissez la matière :</span></div>
+
+    <div class="bar-group">
+      <div class="pill-bar" id="subjectBar">
+        <button type="button" class="pill-btn active" data-subject="math">الرياضيات Mathématiques</button>
+        <button type="button" class="pill-btn" data-subject="physique">الفيزياء Physique</button>
+        <button type="button" class="pill-btn" data-subject="chimie">الكيمياء Chimie</button>
+      </div>
+    </div>
+
+    <div class="green-subtitle">الإعدادي والتأهيلي • جميع المستويات • <span class="ltr">Collège &amp; Lycée (1ère Collège -&gt; 2ème Bac)</span></div>
+
+    <h1 class="hero-title" id="heroTitle">صوّر ورقة الامتحان ولا كتب الأسئلة، وخد الحل كامل خطوة بخطوة مع التحقق</h1>
+
+    <div class="badge-free">
+      <span id="quotaBadge">5 أسئلة فابور بلا كود - لجميع مستويات الإعدادي والتأهيلي</span>
+    </div>
+
+    <div class="wa-gate-box" id="waGateBox">
+      <div class="wa-gate-title">📱 رقم واتساب التلميذ للحصول على 5 أسئلة مجانية</div>
+      <div class="inline-form" id="waEntryRow">
+        <input type="tel" id="studentWaInput" class="text-field ltr" placeholder="06XXXXXXXX" />
+        <button type="button" class="btn-audio" id="saveWaBtn">تأكيد رقم واتساب</button>
+      </div>
+      <div id="waActiveBadge" style="display:none; font-size:0.9rem; color:var(--green); font-weight:700;">
+        <span>الرقم المسجل: <strong class="ltr" id="savedWaDisplay"></strong></span>
+        <button type="button" class="mode-pill" id="changeWaBtn" style="margin-right:10px;">تغيير الرقم</button>
+      </div>
+    </div>
+
+    <div class="sub-caption">لغة الشرح :</div>
+    <div class="bar-group">
+      <div class="pill-bar" id="langBar">
+        <button type="button" class="pill-btn active" data-lang="darija">بالدارجة</button>
+        <button type="button" class="pill-btn" data-lang="ar">العربية الفصحى</button>
+        <button type="button" class="pill-btn" data-lang="fr">Français</button>
+        <button type="button" class="pill-btn" data-lang="ar-fr">العربية + FR</button>
+      </div>
+    </div>
+
+    <div class="photo-grid">
+      <button type="button" class="btn-cam-big" id="camBtn">
+        📷 صوّر ورقة الامتحان
+        <small class="ltr">Prendre une photo</small>
+      </button>
+      <button type="button" class="btn-gal-big" id="galBtn">
+        🖼️ طلع تصويرة من التيليفون
+        <small class="ltr">Choisir une image depuis le téléphone / Galerie</small>
+      </button>
+      <input type="file" id="fileInput" accept="image/*" style="display:none" />
+    </div>
+
+    <div class="input-card">
+      <div class="input-card-header">
+        <span>✏️ ولا كتب التمرين أو الأسئلة هنا مباشرة</span>
+        <span class="ltr">Écrire l'exercice</span>
+      </div>
+
+      <textarea id="exerciseInput" class="dark-textarea" placeholder="مثال: 1) 2x + 4 = 10&#10;2) 3x - 7 = 2x + 5&#10;3) عندي 50 درهم شريت كتاب ب 20 درهم شحال بقا ليا؟"></textarea>
+
+      <div class="action-bottom-row">
+        <button type="button" class="btn-solve-full" id="solveBtn">✈️ حل الامتحان خطوة بخطوة</button>
+        <button type="button" class="btn-example-yellow" id="exampleBtn">✨ جرب مثال (3 أسئلة)</button>
+      </div>
+    </div>
+
+    <div class="status-line" id="ownerStatusLine">دخل رقم الواتساب ديالك باش تستافد من 5 أسئلة مجانية اليوم</div>
+
+    <div class="solution-card" id="solutionBox">
+      <div class="solution-header">
+        <div>
+          <strong style="color:var(--green);">✅ الحل الكامل من الأول حتى الأخير مع التحقق النهائي</strong>
+          <div class="voice-hint" id="voiceStatus">🎧 شرح الأستاذة (العربية / الدارجة) والأستاذ (الفرنسية) جاهز</div>
+        </div>
+        <div class="audio-controls">
+          <button type="button" class="btn-audio" id="speakArBtn">🎧 اسمع الشرح بالعربية</button>
+          <button type="button" class="btn-audio secondary" id="speakFrBtn">🎧 Écouter en Français</button>
+          <button type="button" class="btn-audio secondary" id="stopSpeechBtn">⏹️ إيقاف</button>
+        </div>
+      </div>
+
+      <div id="solutionSteps"></div>
+
+      <div class="reexplain-link" id="reexplainBtn">💡 لا مفهمتيش نزيد نشرح ليك</div>
+      <div class="simple-box" id="simpleExplainBox"></div>
+    </div>
+
+    <div class="sub-box" id="subBox" style="display:none; border-color: var(--yellow);">
+      <strong style="color:var(--yellow);">⚠️ ساليتي 5 أسئلة مجانية ديال اليوم!</strong>
+      <p style="font-size:0.9rem; margin-top:6px;">باش تكمل لمدة 30 يوم، دخل رقم الواتساب ديالك وكود التفعيل الشهري (MATH-XXXX-YYY):</p>
+      <div class="inline-form">
+        <input type="text" id="phoneInput" class="text-field" placeholder="رقم الهاتف (مثال: 0612345678)" />
+        <input type="text" id="codeInput" class="text-field ltr" placeholder="MATH-7392-678" />
+        <button type="button" class="btn-example-yellow" id="activateCodeBtn">تفعيل الاشتراك</button>
+      </div>
+      <div style="margin-top:10px;">
+        <a href="https://wa.me/212679931143" target="_blank" rel="noopener noreferrer" style="color:var(--green); font-weight:700;">📲 طلب الكود فواتساب: 0679931143</a>
+      </div>
+    </div>
+
+    <div class="owner-panel" id="ownerLoginBox" style="display:none; border-color:var(--green);">
+      <strong>🔐 دخول مول الدار</strong>
+      <div class="inline-form">
+        <input type="password" id="ownerPassInput" class="text-field ltr" placeholder="Entrez le code secret..." />
+        <button type="button" class="btn-example-yellow" id="ownerUnlockBtn">دخول</button>
+      </div>
+    </div>
+
+    <div id="levels" style="margin-top:24px;">
+      <div class="sub-caption">المستوى الدراسي - <span class="ltr">Niveau scolaire (Collège &amp; Lycée)</span></div>
+      <div class="bar-group">
+        <div class="pill-bar" id="levelBar">
+          <button type="button" class="pill-btn active" data-level="تلقائي">تلقائي</button>
+          <button type="button" class="pill-btn" data-level="الأولى إعدادي">الأولى إعدادي</button>
+          <button type="button" class="pill-btn" data-level="الثانية إعدادي">الثانية إعدادي</button>
+          <button type="button" class="pill-btn" data-level="الثالثة إعدادي">الثالثة إعدادي</button>
+          <button type="button" class="pill-btn" data-level="الجذع المشترك">الجذع المشترك</button>
+          <button type="button" class="pill-btn" data-level="الأولى باك">الأولى باك</button>
+          <button type="button" class="pill-btn" data-level="الثانية باك">الثانية باك</button>
+        </div>
+      </div>
+
+      <div class="sub-caption">اختر المحور (اختياري) - <span class="ltr">Chapitre (optionnel)</span></div>
+      <div class="bar-group">
+        <div class="pill-bar" id="chapterBar">
+          <button type="button" class="pill-btn active" data-chap="تلقائي">تلقائي</button>
+          <button type="button" class="pill-btn" data-chap="المعادلات">المعادلات</button>
+          <button type="button" class="pill-btn" data-chap="الدوال">الدوال</button>
+          <button type="button" class="pill-btn" data-chap="المتتاليات">المتتاليات</button>
+          <button type="button" class="pill-btn" data-chap="الهندسة">الهندسة</button>
+          <button type="button" class="pill-btn" data-chap="الاحتمالات">الاحتمالات</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="help-box">
+      <strong>عندك مشكل فالموقع؟ كتبو هنا</strong>
+      <div class="inline-form">
+        <input type="text" id="issueInput" class="text-field" placeholder="اكتب المشكل ديالك هنا..." />
+        <button type="button" class="btn-example-yellow" id="sendIssueBtn" style="background:var(--green);">صيفط المشكل فواتساب</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var selectedSubject = 'math';
+      var isOwner = localStorage.getItem('ms_owner') === 'true';
+      var isSubscribed = localStorage.getItem('ms_sub') === 'true';
+      var studentWa = localStorage.getItem('ms_wa') || '';
+      var lastSimpleExplanation = '';
+      var lastFullSpeechAr = '';
+      var lastFullSpeechFr = '';
+      var speechQueue = [];
+      var isSpeakingQueue = false;
+
+      var titles = {
+        math: 'صوّر ورقة الامتحان ولا كتب الأسئلة، وخد الحل كامل خطوة بخطوة مع التحقق',
+        physique: 'صوّر ورقة الفيزياء ولا كتب الأسئلة، وخد الحل كامل خطوة بخطوة مع التحقق',
+        chimie: 'صوّر ورقة الكيمياء ولا كتب الأسئلة، وخد الحل كامل خطوة بخطوة مع التحقق'
+      };
+
+      function getUsedForWa(wa) {
+        if (!wa) return 0;
+        var today = new Date().toISOString().slice(0, 10);
+        return parseInt(localStorage.getItem('ms_used_' + wa + '_' + today) || '0', 10) || 0;
+      }
+
+      function incrementUsedForWa(wa) {
+        if (!wa) return;
+        var today = new Date().toISOString().slice(0, 10);
+        var next = getUsedForWa(wa) + 1;
+        localStorage.setItem('ms_used_' + wa + '_' + today, String(next));
+      }
+
+      function updateStatusUI() {
+        var statusLine = document.getElementById('ownerStatusLine');
+        if (!statusLine) return;
+        if (isOwner) {
+          statusLine.textContent = 'مرحبا مول الدار - الجهاز محفوظ، سكريفي على راحتك وأسئلة بلا حدود';
+        } else if (isSubscribed) {
+          statusLine.textContent = 'اشتراك الشهر مفعّل (30 يوم) - أسئلة بلا حدود';
+        } else if (!studentWa) {
+          statusLine.textContent = 'خاصك تدخل رقم الواتساب ديالك فالأول باش تاخد 5 أسئلة مجانية اليوم';
+        } else {
+          var left = Math.max(0, 5 - getUsedForWa(studentWa));
+          statusLine.textContent = 'باقي ليك ' + left + ' من 5 أسئلة مجانية اليوم (الرقم: ' + studentWa + ')';
+        }
+      }
+
+      function renderWaUI() {
+        var entryRow = document.getElementById('waEntryRow');
+        var activeBadge = document.getElementById('waActiveBadge');
+        var savedDisplay = document.getElementById('savedWaDisplay');
+        if (studentWa) {
+          entryRow.style.display = 'none';
+          activeBadge.style.display = 'flex';
+          savedDisplay.textContent = studentWa;
+        } else {
+          entryRow.style.display = 'flex';
+          activeBadge.style.display = 'none';
+        }
+        updateStatusUI();
+      }
+
+      renderWaUI();
+
+      document.getElementById('saveWaBtn').addEventListener('click', function () {
+        var raw = document.getElementById('studentWaInput').value || '';
+        var clean = raw.replace(/\D/g, '');
+        if (clean.length < 8) {
+          alert('دخل رقم واتساب صحيح (مثال: 0679931143)');
+          return;
+        }
+        studentWa = clean;
+        localStorage.setItem('ms_wa', studentWa);
+        renderWaUI();
+      });
+
+      document.getElementById('changeWaBtn').addEventListener('click', function () {
+        studentWa = '';
+        localStorage.removeItem('ms_wa');
+        document.getElementById('studentWaInput').value = '';
+        renderWaUI();
+      });
+
+      function formatNaturalSpeech(text, lang) {
+        return (text || '')
+          .replace(/=>/g, lang === 'fr' ? ' donc ' : ' إذن ')
+          .replace(/\+/g, lang === 'fr' ? ' plus ' : ' زائد ')
+          .replace(/-/g, lang === 'fr' ? ' moins ' : ' ناقص ')
+          .replace(/=/g, lang === 'fr' ? ' égale ' : ' كتساوي ')
+          .replace(/\//g, lang === 'fr' ? ' divisé par ' : ' مقسومة على ')
+          .replace(/\bx\b/gi, lang === 'fr' ? ' x ' : ' إكس ')
+          .replace(/\s+/g, ' ')
+          .trim();
+      }
+
+      function stopTeacherSpeech() {
+        isSpeakingQueue = false;
+        speechQueue = [];
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+        }
+        document.getElementById('voiceStatus').textContent = '🎧 شرح الأستاذة (العربية / الدارجة) والأستاذ (الفرنسية) جاهز';
+      }
+
+      function speakTeacher(lang) {
+        if (!('speechSynthesis' in window)) {
+          alert('المتصفح الحالي لا يدعم القراءة الصوتية');
+          return;
+        }
+        stopTeacherSpeech();
+        var raw = lang === 'fr' ? lastFullSpeechFr : lastFullSpeechAr;
+        var cleaned = formatNaturalSpeech(raw, lang);
+        if (!cleaned) return;
+
+        var parts = cleaned.split(/[.!؟\n]+/).map(function (s) { return s.trim(); }).filter(Boolean);
+        if (!parts.length) return;
+        speechQueue = parts;
+        isSpeakingQueue = true;
+
+        var statusEl = document.getElementById('voiceStatus');
+        var voices = window.speechSynthesis.getVoices() || [];
+        var chosen = voices.find(function (v) {
+          return lang === 'fr' ? /fr/i.test(v.lang) : /ar/i.test(v.lang);
+        }) || null;
+
+        function playNext(idx) {
+          if (!isSpeakingQueue || idx >= speechQueue.length) {
+            isSpeakingQueue = false;
+            statusEl.textContent = '✅ انتهى الشرح الصوتي الكامل';
+            return;
+          }
+          var utter = new SpeechSynthesisUtterance(speechQueue[idx]);
+          if (chosen) utter.voice = chosen;
+          utter.lang = lang === 'fr' ? 'fr-FR' : 'ar-SA';
+          utter.rate = 0.96;
+          utter.pitch = lang === 'fr' ? 0.98 : 1.12;
+          utter.onstart = function () {
+            statusEl.textContent = '🎙️ جاري الشرح الصوتي (' + (idx + 1) + '/' + speechQueue.length + ')...';
+          };
+          utter.onend = function () { playNext(idx + 1); };
+          utter.onerror = function () { playNext(idx + 1); };
+          window.speechSynthesis.speak(utter);
+        }
+
+        playNext(0);
+      }
+
+      document.getElementById('speakArBtn').addEventListener('click', function () { speakTeacher('ar'); });
+      document.getElementById('speakFrBtn').addEventListener('click', function () { speakTeacher('fr'); });
+      document.getElementById('stopSpeechBtn').addEventListener('click', stopTeacherSpeech);
+
+      document.getElementById('modeToggle').addEventListener('click', function () {
+        document.body.classList.toggle('light-mode');
+        this.textContent = document.body.classList.contains('light-mode') ? 'Mode Sombre 🌙' : 'Mode Clair ☀️';
+      });
+
+      function bindPills(barId, onSelect) {
+        var bar = document.getElementById(barId);
+        bar.addEventListener('click', function (e) {
+          var btn = e.target.closest('.pill-btn');
+          if (!btn) return;
+          Array.prototype.forEach.call(bar.querySelectorAll('.pill-btn'), function (b) {
+            b.classList.remove('active');
+          });
+          btn.classList.add('active');
+          if (onSelect) onSelect(btn);
+        });
+      }
+
+      bindPills('subjectBar', function (btn) {
+        selectedSubject = btn.getAttribute('data-subject') || 'math';
+        document.getElementById('heroTitle').textContent = titles[selectedSubject];
+      });
+      bindPills('langBar');
+      bindPills('levelBar');
+      bindPills('chapterBar');
+
+      var logoClicks = 0;
+      document.getElementById('secretOwnerTrigger').addEventListener('click', function () {
+        logoClicks++;
+        if (logoClicks >= 3) {
+          document.getElementById('ownerLoginBox').style.display = 'block';
+          logoClicks = 0;
+        }
+      });
+
+      document.getElementById('ownerUnlockBtn').addEventListener('click', function () {
+        var val = (document.getElementById('ownerPassInput').value || '').trim().toLowerCase();
+        if (val === 'toufik legend') {
+          isOwner = true;
+          localStorage.setItem('ms_owner', 'true');
+          document.getElementById('ownerLoginBox').style.display = 'none';
+          document.getElementById('subBox').style.display = 'none';
+          updateStatusUI();
+          alert('مرحبا مول الدار! تم تفعيل الصلاحيات الكاملة.');
+        } else {
+          alert('كود غير صحيح');
+        }
+      });
+
+      document.getElementById('activateCodeBtn').addEventListener('click', function () {
+        var phone = (document.getElementById('phoneInput').value || '').replace(/\D/g, '');
+        var code = (document.getElementById('codeInput').value || '').trim().toUpperCase();
+        if (phone.length < 3) {
+          alert('دخل رقم الهاتف صحيح');
+          return;
+        }
+        var last3 = phone.slice(-3);
+        var match = code.match(/^MATH-\d{4}-(\d{3})$/);
+        if (!match) {
+          alert('صيغة الكود خاصها تكون بحال: MATH-7392-' + last3);
+          return;
+        }
+        if (match[1] !== last3) {
+          alert('الكود لا يطابق رقم الهاتف');
+          return;
+        }
+        isSubscribed = true;
+        localStorage.setItem('ms_sub', 'true');
+        document.getElementById('subBox').style.display = 'none';
+        updateStatusUI();
+        alert('تم التفعيل بنجاح لمدة 30 يوم!');
+      });
+
+      document.getElementById('exampleBtn').addEventListener('click', function () {
+        document.getElementById('exerciseInput').value =
+          '1) 2x + 4 = 10\n2) 3x - 7 = 2x + 5\n3) عندي 50 درهم شريت كتاب ب 20 درهم شحال بقا ليا؟';
+      });
+
+      function splitIntoQuestions(raw) {
+        var lines = (raw || '')
+          .split(/\r?\n|;|•/)
+          .map(function (l) {
+            return l.replace(/^\s*(?:\d+\s*[\)\.\-:])\s*/, '').trim();
+          })
+          .filter(Boolean);
+        return lines.length ? lines : ['3x - 7 = 2x + 5'];
+      }
+
+      function solveSingleQuestion(text, index) {
+        var darijaMatch = text.match(/عندي\s*(\d+(?:[.,]\d+)?).*?(?:شريت|خسرت|عطيت).*?(\d+(?:[.,]\d+)?)/);
+        if (selectedSubject === 'math' && darijaMatch) {
+          var total = parseFloat(darijaMatch[1].replace(',', '.'));
+          var spent = parseFloat(darijaMatch[2].replace(',', '.'));
+          var rest = total - spent;
+          return {
+            title: 'السؤال ' + index + ': ' + text,
+            steps: [
+              'المعطيات: كان عندك ' + total + ' درهم، وصرفتي ' + spent + ' درهم.',
+              'العملية: كنطرحو المبلغ اللي تصرف من المبلغ الأول: ' + total + ' - ' + spent,
+              'النتيجة: بقا ليك ' + rest + ' درهم.',
+              'التحقق النهائي: ' + rest + ' + ' + spent + ' = ' + total + ' درهم'
+            ],
+            speechAr: 'السؤال ' + index + '. كانو عندنا ' + total + ' درهم، وصرفنا ' + spent + ' درهم. ' + total + ' ناقص ' + spent + ' كتساوي ' + rest + ' درهم.',
+            speechFr: 'Question ' + index + '. Vous avez ' + total + ' dirhams et dépensez ' + spent + ' dirhams. ' + total + ' moins ' + spent + ' égale ' + rest + '.'
+          };
+        }
+
+        var eqMatch = text.replace(/\s+/g, '').match(/^([+-]?\d*)x([+-]\d+)?=([+-]?\d*)x([+-]\d+)?$/i);
+        if (selectedSubject === 'math' && eqMatch) {
+          var parseCoeff = function (s) {
+            if (s === '' || s === '+') return 1;
+            if (s === '-') return -1;
+            return parseFloat(s);
+          };
+          var a = parseCoeff(eqMatch[1]);
+          var b = eqMatch[2] ? parseFloat(eqMatch[2]) : 0;
+          var c = parseCoeff(eqMatch[3]);
+          var d = eqMatch[4] ? parseFloat(eqMatch[4]) : 0;
+          var leftX = a - c;
+          var rightN = d - b;
+          var x = leftX !== 0 ? rightN / leftX : 0;
+          return {
+            title: 'السؤال ' + index + ': ' + text,
+            steps: [
+              'المعادلة: ' + text,
+              'نجمع المجاهيل x في طرف والأعداد في طرف: (' + a + ' - ' + c + ')x = ' + d + ' - (' + b + ')',
+              'التبسيط: ' + leftX + 'x = ' + rightN + ' => x = ' + rightN + ' / ' + leftX + ' = ' + x,
+              'التحقق النهائي: نعوض x = ' + x + ' في الطرفين فنجد نفس القيمة'
+            ],
+            speechAr: 'السؤال ' + index + '. نجمع إكس في جهة والأعداد في جهة أخرى، فنجد ' + leftX + ' إكس كتساوي ' + rightN + '، إذن إكس كتساوي ' + x + '.',
+            speechFr: 'Question ' + index + '. On regroupe les termes en x et les nombres. On trouve ' + leftX + ' x égale ' + rightN + ', donc x égale ' + x + '.'
+          };
+        }
+
+        return {
+          title: 'السؤال ' + index + ': ' + text,
+          steps: [
+            'المعطيات: ' + text,
+            'الحل خطوة بخطوة: استخراج المطلوب وتطبيق القاعدة المناسبة للمادة المختارة',
+            'التحقق النهائي: مراجعة الخطوات والوحدة والتأكد من صحة النتيجة'
+          ],
+          speechAr: 'السؤال ' + index + '. نحدد المعطيات ونحل السؤال خطوة بخطوة مع التحقق النهائي.',
+          speechFr: 'Question ' + index + '. On relève les données et on résout étape par étape avec vérification.'
+        };
+      }
+
+      function runSolveFlow(customText) {
+        if (!isOwner && !isSubscribed) {
+          if (!studentWa) {
+            alert('دخل رقم الواتساب ديالك فالأول باش تاخد 5 أسئلة مجانية اليوم');
+            document.getElementById('studentWaInput').focus();
+            return;
+          }
+          if (getUsedForWa(studentWa) >= 5) {
+            document.getElementById('subBox').style.display = 'block';
+            document.getElementById('subBox').scrollIntoView({ behavior: 'smooth' });
+            return;
+          }
+        }
+
+        var inputEl = document.getElementById('exerciseInput');
+        var rawText = typeof customText === 'string' ? customText : inputEl.value;
+        var effectiveText = (rawText || '').trim() || '1) 2x + 4 = 10\n2) 3x - 7 = 2x + 5';
+        if (!(rawText || '').trim()) inputEl.value = effectiveText;
+
+        var questions = splitIntoQuestions(effectiveText);
+        var solvedList = questions.map(function (q, idx) {
+          return solveSingleQuestion(q, idx + 1);
+        });
+
+        if (!isOwner && !isSubscribed && studentWa) {
+          incrementUsedForWa(studentWa);
+          updateStatusUI();
+        }
+
+        var stepsDiv = document.getElementById('solutionSteps');
+        stepsDiv.innerHTML = solvedList.map(function (qBlock) {
+          return (
+            '<div class="question-block">' +
+              '<div class="question-heading">' + qBlock.title + '</div>' +
+              qBlock.steps.map(function (s) { return '<div class="step-item">' + s + '</div>'; }).join('') +
+            '</div>'
+          );
+        }).join('');
+
+        lastSimpleExplanation = 'مثال مبسط: إذا كان لديك 10 دراهم وأخذت 4 دراهم، يبقى 6 دراهم؛ وفي المعادلات نجمع الحدود المتشابهة ثم نقسم على معامل المجهول.';
+        lastFullSpeechAr = solvedList.map(function (item) { return item.speechAr; }).join(' ');
+        lastFullSpeechFr = solvedList.map(function (item) { return item.speechFr; }).join(' ');
+
+        document.getElementById('simpleExplainBox').style.display = 'none';
+        var box = document.getElementById('solutionBox');
+        box.style.display = 'block';
+        box.scrollIntoView({ behavior: 'smooth' });
+      }
+
+      document.getElementById('solveBtn').addEventListener('click', function () { runSolveFlow(); });
+
+      document.getElementById('reexplainBtn').addEventListener('click', function () {
+        var sBox = document.getElementById('simpleExplainBox');
+        sBox.textContent = lastSimpleExplanation;
+        sBox.style.display = 'block';
+      });
+
+      var fileInput = document.getElementById('fileInput');
+      function triggerImagePick(useCamera) {
+        if (useCamera) fileInput.setAttribute('capture', 'environment');
+        else fileInput.removeAttribute('capture');
+        fileInput.click();
+      }
+
+      document.getElementById('navPhotoBtn').addEventListener('click', function () { triggerImagePick(false); });
+      document.getElementById('camBtn').addEventListener('click', function () { triggerImagePick(true); });
+      document.getElementById('galBtn').addEventListener('click', function () { triggerImagePick(false); });
+
+      fileInput.addEventListener('change', function (e) {
+        var file = e.target.files && e.target.files[0];
+        if (!file) return;
+        var inputEl = document.getElementById('exerciseInput');
+        var fallback = '1) 2x + 4 = 10\n2) 3x - 7 = 2x + 5\n3) عندي 50 درهم شريت كتاب ب 20 درهم شحال بقا ليا؟';
+        inputEl.value = fallback;
+        runSolveFlow(fallback);
+      });
+
+      document.getElementById('sendIssueBtn').addEventListener('click', function () {
+        var msg = encodeURIComponent(document.getElementById('issueInput').value.trim() || 'عندي مشكل فالموقع Math Solution');
+        window.open('https://wa.me/212679931143?text=' + msg, '_blank', 'noopener,noreferrer');
+      });
+    })();
+  </script>
+</body>
+</html>
