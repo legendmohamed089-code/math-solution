@@ -13,7 +13,6 @@
       --text: #ffffff;
       --muted: #a3a3a3;
       --green: #00C853;
-      --green-dark: #00963f;
       --yellow: #FFD600;
       --border: #262626;
       --textarea-bg: #121212;
@@ -42,7 +41,6 @@
     }
 
     .ltr { direction: ltr; unicode-bidi: isolate; text-align: left; }
-    .rtl { direction: rtl; unicode-bidi: isolate; text-align: right; }
 
     .navbar {
       display: flex;
@@ -74,9 +72,6 @@
       font-weight: 700;
       font-size: 0.9rem;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
     }
 
     .nav-links {
@@ -98,7 +93,6 @@
       font-weight: 900;
       cursor: pointer;
       user-select: none;
-      letter-spacing: -0.5px;
     }
 
     .brand-logo span { color: var(--green); }
@@ -156,7 +150,6 @@
       font-weight: 700;
       font-size: 0.9rem;
       cursor: pointer;
-      transition: 0.15s;
     }
 
     .pill-btn.active {
@@ -343,243 +336,4 @@
 
     .audio-controls {
       display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .btn-audio {
-      background: var(--green);
-      color: #000000;
-      border: none;
-      padding: 7px 14px;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    .btn-audio.secondary {
-      background: var(--surface-2);
-      color: var(--text);
-      border: 1px solid var(--green);
-    }
-
-    .voice-hint {
-      font-size: 0.8rem;
-      color: var(--muted);
-      margin-top: 6px;
-    }
-
-    .question-block {
-      margin-bottom: 16px;
-      padding: 14px;
-      background: var(--surface);
-      border-radius: 12px;
-      border: 1px solid var(--border);
-    }
-
-    .question-heading {
-      color: var(--green);
-      font-weight: 800;
-      margin-bottom: 8px;
-      font-size: 1rem;
-    }
-
-    .step-item {
-      margin-bottom: 8px;
-      padding: 8px 12px;
-      background: var(--bg);
-      border-radius: 8px;
-      border-right: 3px solid var(--green);
-      font-size: 0.94rem;
-    }
-
-    .reexplain-link {
-      display: inline-block;
-      margin-top: 12px;
-      color: var(--yellow);
-      font-weight: 700;
-      cursor: pointer;
-      text-decoration: underline;
-      font-size: 0.95rem;
-    }
-
-    .simple-box {
-      margin-top: 12px;
-      padding: 14px;
-      background: rgba(255, 214, 0, 0.1);
-      border: 1px solid var(--yellow);
-      border-radius: 10px;
-      display: none;
-    }
-
-    .sub-box, .owner-panel, .help-box {
-      margin-top: 20px;
-      padding: 16px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-    }
-
-    .inline-form {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 10px;
-    }
-
-    .text-field {
-      flex: 1;
-      min-width: 180px;
-      padding: 10px 14px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--text);
-    }
-  </style>
-</head>
-<body>
-
-  <nav class="navbar">
-    <div class="nav-right">
-      <div class="brand-logo" id="secretOwnerTrigger"><span>Math</span> Solution</div>
-      <button type="button" class="mode-pill" id="modeToggle">Mode Clair ☀️</button>
-    </div>
-
-    <div class="nav-links">
-      <a href="#top" class="active">الرئيسية</a>
-      <a href="#levels">المواضيع</a>
-      <a href="#solutionBox">السجل</a>
-    </div>
-
-    <div class="nav-left">
-      <button type="button" class="btn-photo-nav" onclick="triggerImagePick(false)">📷 صور المسألة</button>
-    </div>
-  </nav>
-
-  <div class="main-wrapper" id="top">
-    <div class="sub-caption">اختر المادة الرئيسية - <span class="ltr">Choisissez la matière :</span></div>
-
-    <div class="bar-group">
-      <div class="pill-bar" id="subjectBar">
-        <button type="button" class="pill-btn active" data-subject="math">الرياضيات Mathématiques</button>
-        <button type="button" class="pill-btn" data-subject="physique">الفيزياء Physique</button>
-        <button type="button" class="pill-btn" data-subject="chimie">الكيمياء Chimie</button>
-      </div>
-    </div>
-
-    <div class="green-subtitle">الإعدادي والتأهيلي • جميع المستويات • <span class="ltr">Collège & Lycée (1ère Collège -> 2ème Bac)</span></div>
-
-    <h1 class="hero-title" id="heroTitle">صوّر ورقة الامتحان ولا كتب الأسئلة، وخد الحل كامل خطوة بخطوة مع التحقق</h1>
-
-    <div class="badge-free">
-      <span id="quotaBadge">5 أسئلة فابور بلا كود - لجميع مستويات الإعدادي والتأهيلي</span>
-    </div>
-
-    <div class="wa-gate-box" id="waGateBox">
-      <div class="wa-gate-title">📱 رقم واتساب التلميذ للحصول على 5 أسئلة مجانية</div>
-      <div class="inline-form" id="waEntryRow">
-        <input type="tel" id="studentWaInput" class="text-field ltr" placeholder="06XXXXXXXX" />
-        <button type="button" class="btn-audio" id="saveWaBtn">تأكيد رقم واتساب</button>
-      </div>
-      <div id="waActiveBadge" style="display:none; font-size:0.9rem; color:var(--green); font-weight:700;">
-        <span>الرقم المسجل: <strong class="ltr" id="savedWaDisplay"></strong></span>
-        <button type="button" class="mode-pill" id="changeWaBtn" style="margin-right:10px;">تغيير الرقم</button>
-      </div>
-    </div>
-
-    <div class="sub-caption">لغة الشرح :</div>
-    <div class="bar-group">
-      <div class="pill-bar" id="langBar">
-        <button type="button" class="pill-btn active" data-lang="darija">بالدارجة</button>
-        <button type="button" class="pill-btn" data-lang="ar">العربية الفصحى</button>
-        <button type="button" class="pill-btn" data-lang="fr">Français</button>
-        <button type="button" class="pill-btn" data-lang="ar-fr">العربية + FR</button>
-      </div>
-    </div>
-
-    <div class="photo-grid">
-      <button type="button" class="btn-cam-big" id="camBtn">
-        📷 صوّر ورقة الامتحان
-        <small class="ltr">Prendre une photo</small>
-      </button>
-      <button type="button" class="btn-gal-big" id="galBtn">
-        🖼️ طلع تصويرة من التيليفون
-        <small class="ltr">Choisir une image depuis le téléphone / Galerie</small>
-      </button>
-      <input type="file" id="fileInput" accept="image/*" style="display:none" />
-    </div>
-
-    <div class="input-card">
-      <div class="input-card-header">
-        <span>✏️ ولا كتب التمرين أو الأسئلة هنا مباشرة</span>
-        <span class="ltr">Écrire l'exercice</span>
-      </div>
-
-      <textarea id="exerciseInput" class="dark-textarea" placeholder="مثال:&#10;1) 2x + 4 = 10&#10;2) 3x - 7 = 2x + 5&#10;3) عندي 50 درهم شريت كتاب ب 20 درهم شحال بقا ليا؟"></textarea>
-
-      <div class="action-bottom-row">
-        <button type="button" class="btn-solve-full" id="solveBtn">✈️ حل الامتحان خطوة بخطوة</button>
-        <button type="button" class="btn-example-yellow" id="exampleBtn">✨ جرب مثال (3 أسئلة)</button>
-      </div>
-    </div>
-
-    <div class="status-line" id="ownerStatusLine">دخل رقم الواتساب ديالك باش تستافد من 5 أسئلة مجانية اليوم</div>
-
-    <div class="solution-card" id="solutionBox">
-      <div class="solution-header">
-        <div>
-          <strong style="color:var(--green);">✅ الحل الكامل من الأول حتى الأخير مع التحقق النهائي</strong>
-          <div class="voice-hint" id="voiceStatus">🎧 شرح الأستاذة (العربية / الدارجة) والأستاذ (الفرنسية) جاهز</div>
-        </div>
-        <div class="audio-controls">
-          <button type="button" class="btn-audio" onclick="speakTeacher('ar')">🎧 اسمع الشرح بالعربية</button>
-          <button type="button" class="btn-audio secondary" onclick="speakTeacher('fr')">🎧 Écouter en Français</button>
-          <button type="button" class="btn-audio secondary" onclick="stopTeacherSpeech()">⏹️ إيقاف</button>
-        </div>
-      </div>
-
-      <div id="solutionSteps"></div>
-
-      <div class="reexplain-link" id="reexplainBtn">💡 لا مفهمتيش نزيد نشرح ليك</div>
-      <div class="simple-box" id="simpleExplainBox"></div>
-    </div>
-
-    <div class="sub-box" id="subBox" style="display:none; border-color: var(--yellow);">
-      <strong style="color:var(--yellow);">⚠️ ساليتي 5 أسئلة مجانية ديال اليوم!</strong>
-      <p style="font-size:0.9rem; margin-top:6px;">باش تكمل لمدة 30 يوم، دخل رقم الواتساب ديالك وكود التفعيل الشهري (MATH-XXXX-YYY):</p>
-      <div class="inline-form">
-        <input type="text" id="phoneInput" class="text-field" placeholder="رقم الهاتف (مثال: 0612345678)" />
-        <input type="text" id="codeInput" class="text-field ltr" placeholder="MATH-7392-678" />
-        <button type="button" class="btn-example-yellow" id="activateCodeBtn">تفعيل الاشتراك</button>
-      </div>
-      <div style="margin-top:10px;">
-        <a href="https://wa.me/212679931143?text=%D8%B3%D9%84%D8%A7%D9%85%D8%8C%20%D8%A8%D8%BA%D9%8A%D8%AA%20%D9%83%D9%88%D8%AF%20%D8%A7%D9%84%D8%A7%D8%B4%D8%AA%D8%B1%D8%A7%D9%83%20%D8%A7%D9%84%D8%B4%D9%87%D8%B1%D9%8A%20Math%20Solution" target="_blank" style="color:var(--green); font-weight:700;">📲 طلب الكود فواتساب: 0679931143</a>
-      </div>
-    </div>
-
-    <div class="owner-panel" id="ownerLoginBox" style="display:none; border-color:var(--green);">
-      <strong>🔐 دخول مول الدار</strong>
-      <div class="inline-form">
-        <input type="password" id="ownerPassInput" class="text-field ltr" placeholder="Entrez le code secret..." />
-        <button type="button" class="btn-example-yellow" id="ownerUnlockBtn">دخول</button>
-      </div>
-    </div>
-
-    <div id="levels" style="margin-top:24px;">
-      <div class="sub-caption">المستوى الدراسي - <span class="ltr">Niveau scolaire (Collège & Lycée)</span></div>
-      <div class="bar-group">
-        <div class="pill-bar" id="levelBar">
-          <button type="button" class="pill-btn active" data-level="تلقائي">تلقائي</button>
-          <button type="button" class="pill-btn" data-level="الأولى إعدادي">الأولى إعدادي</button>
-          <button type="button" class="pill-btn" data-level="الثانية إعدادي">الثانية إعدادي</button>
-          <button type="button" class="pill-btn" data-level="الثالثة إعدادي">الثالثة إعدادي</button>
-          <button type="button" class="pill-btn" data-level="الجذع المشترك">الجذع المشترك</button>
-          <button type="button" class="pill-btn" data-level="الأولى باك">الأولى باك</button>
-          <button type="button" class="pill-btn" data-level="الثانية باك">الثانية باك</button>
-        </div>
-      </div>
-
-      <div class="sub-caption">اختر المحور (اختياري) - <span class="ltr">Chapitre (optionnel)</span></div>
+      flex-wrap:
