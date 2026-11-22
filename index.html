@@ -35,7 +35,7 @@
       background: var(--bg);
       color: var(--text);
       font-family: system-ui, -apple-system, "Segoe UI", Tahoma, Arial, sans-serif;
-      line-height: 1.6;
+      line-height: 1.7;
       min-height: 100vh;
     }
 
@@ -358,14 +358,14 @@
     }
 
     .voice-hint {
-      font-size: 0.8rem;
+      font-size: 0.82rem;
       color: var(--muted);
       margin-top: 6px;
     }
 
     .question-block {
-      margin-bottom: 16px;
-      padding: 14px;
+      margin-bottom: 18px;
+      padding: 16px;
       background: var(--surface);
       border-radius: 12px;
       border: 1px solid var(--border);
@@ -374,17 +374,25 @@
     .question-heading {
       color: var(--green);
       font-weight: 800;
-      margin-bottom: 8px;
-      font-size: 1rem;
+      margin-bottom: 10px;
+      font-size: 1.02rem;
     }
 
     .step-item {
-      margin-bottom: 8px;
-      padding: 8px 12px;
+      margin-bottom: 10px;
+      padding: 10px 14px;
       background: var(--bg);
       border-radius: 8px;
       border-right: 3px solid var(--green);
-      font-size: 0.94rem;
+      font-size: 0.95rem;
+    }
+
+    .step-label {
+      display: block;
+      font-weight: 800;
+      color: var(--green);
+      margin-bottom: 3px;
+      font-size: 0.88rem;
     }
 
     .reexplain-link {
@@ -404,6 +412,7 @@
       border: 1px solid var(--yellow);
       border-radius: 10px;
       display: none;
+      line-height: 1.75;
     }
 
     .sub-box, .owner-panel, .help-box {
@@ -523,8 +532,8 @@
     <div class="solution-card" id="solutionBox">
       <div class="solution-header">
         <div>
-          <strong style="color:var(--green);">✅ الحل الكامل من الأول حتى الأخير مع الشرح والتحقق</strong>
-          <div class="voice-hint" id="voiceStatus">🎧 شرح الأستاذة (العربية / الدارجة) والأستاذ (الفرنسية) جاهز</div>
+          <strong style="color:var(--green);">✅ الشرح المفصل والحل الكامل من الأول حتى الأخير مع التحقق</strong>
+          <div class="voice-hint" id="voiceStatus">🎧 شرح الأستاذة (بالدارجة / العربية) والأستاذ (بالفرنسية) جاهز</div>
         </div>
         <div class="audio-controls">
           <button type="button" class="btn-audio" id="speakArBtn">🎧 اسمع الشرح بالعربية</button>
@@ -600,6 +609,7 @@
     (function () {
       var selectedSubject = 'math';
       var selectedLang = 'darija';
+      var selectedLevel = 'تلقائي';
       var isOwner = localStorage.getItem('ms_owner') === 'true';
       var isSubscribed = localStorage.getItem('ms_sub') === 'true';
       var studentWa = localStorage.getItem('ms_wa') || '';
@@ -680,13 +690,13 @@
         renderWaUI();
       });
 
-      function formatNaturalSpeech(text, lang) {
+      function cleanForSpeech(text, lang) {
         return (text || '')
           .replace(/=>/g, lang === 'fr' ? ' donc ' : ' إذن ')
           .replace(/\+/g, lang === 'fr' ? ' plus ' : ' زائد ')
           .replace(/-/g, lang === 'fr' ? ' moins ' : ' ناقص ')
           .replace(/=/g, lang === 'fr' ? ' égale ' : ' يساوي ')
-          .replace(/\//g, lang === 'fr' ? ' sur ' : ' على ')
+          .replace(/\//g, lang === 'fr' ? ' divisé par ' : ' مقسوم على ')
           .replace(/\bx\b/gi, lang === 'fr' ? ' x ' : ' إكس ')
           .replace(/[^\u0600-\u06FFa-zA-Z0-9\s.,؟!]/g, ' ')
           .replace(/\s+/g, ' ')
@@ -707,17 +717,17 @@
         if ('speechSynthesis' in window) {
           try { window.speechSynthesis.cancel(); } catch (_) {}
         }
-        document.getElementById('voiceStatus').textContent = '🎧 شرح الأستاذة (العربية / الدارجة) والأستاذ (الفرنسية) جاهز';
+        document.getElementById('voiceStatus').textContent = '🎧 شرح الأستاذة (بالدارجة / العربية) والأستاذ (بالفرنسية) جاهز';
       }
 
-      function pickBestVoice(lang) {
+      function pickVoice(lang) {
         if (!('speechSynthesis' in window)) return null;
         var voices = window.speechSynthesis.getVoices() || [];
         if (!voices.length) return null;
         if (lang === 'fr') {
-          return voices.find(function (v) { return /^fr/i.test(v.lang || ''); }) || voices[0];
+          return voices.find(function (v) { return /^fr/i.test(v.lang || ''); }) || null;
         }
-        return voices.find(function (v) { return /^(ar-MA|ar-SA|ar)/i.test(v.lang || ''); }) || voices[0];
+        return voices.find(function (v) { return /^(ar-MA|ar-SA|ar)/i.test(v.lang || ''); }) || null;
       }
 
       function speakTeacher(lang) {
@@ -727,23 +737,27 @@
         }
         stopTeacherSpeech();
         var raw = lang === 'fr' ? lastFullSpeechFr : lastFullSpeechAr;
-        var cleaned = formatNaturalSpeech(raw, lang);
+        var cleaned = cleanForSpeech(raw, lang);
         if (!cleaned) {
-          alert('حل التمرين أولاً باش يتكون الشرح الصوتي');
+          alert('حل التمرين أولاً باش يبان الشرح الصوتي');
           return;
         }
 
         var parts = cleaned
           .split(/[.!؟\n]+/)
           .map(function (s) { return s.trim(); })
-          .filter(function (s) { return s.length > 1; });
+          .filter(function (s) { return s.length > 2; });
 
         if (!parts.length) parts = [cleaned];
         speechQueue = parts;
         isSpeakingQueue = true;
 
         var statusEl = document.getElementById('voiceStatus');
-        var chosen = pickBestVoice(lang);
+        var chosen = pickVoice(lang);
+
+        if (lang === 'ar' && !chosen) {
+          statusEl.textContent = '⚠️ لم يتم العثور على صوت عربي مثبت في المتصفح؛ قد يقرأ المتصفح بصوت افتراضي';
+        }
 
         function playNext(idx) {
           clearSpeechTimer();
@@ -756,9 +770,9 @@
           var chunk = speechQueue[idx];
           var utter = new SpeechSynthesisUtterance(chunk);
           if (chosen) utter.voice = chosen;
-          utter.lang = lang === 'fr' ? 'fr-FR' : ((chosen && chosen.lang) || 'ar-SA');
-          utter.rate = 0.94;
-          utter.pitch = lang === 'fr' ? 0.98 : 1.08;
+          utter.lang = lang === 'fr' ? 'fr-FR' : 'ar-SA';
+          utter.rate = 0.9;
+          utter.pitch = lang === 'fr' ? 0.96 : 1.05;
 
           var finished = false;
           function doneOnce() {
@@ -769,7 +783,10 @@
           }
 
           utter.onstart = function () {
-            statusEl.textContent = (lang === 'fr' ? '🎙️ الأستاذ يشرح بالفرنسية (' : '🎙️ الأستاذة تشرح بالعربية والدارجة (') + (idx + 1) + '/' + speechQueue.length + ')...';
+            var roleText = lang === 'fr'
+              ? '🎙️ الأستاذ يشرح بالفرنسية بتفصيل ('
+              : '🎙️ الأستاذة تشرح بالعربية والدارجة بتفصيل (';
+            statusEl.textContent = roleText + (idx + 1) + '/' + speechQueue.length + ')...';
           };
           utter.onend = doneOnce;
           utter.onerror = doneOnce;
@@ -784,18 +801,12 @@
             return;
           }
 
-          var estimatedMs = Math.max(2500, chunk.length * 95);
+          var estimatedMs = Math.max(3500, chunk.length * 115);
           speechWatchdog = setTimeout(function () {
             if (isSpeakingQueue && !finished) {
               doneOnce();
             }
           }, estimatedMs);
-        }
-
-        if ((window.speechSynthesis.getVoices() || []).length === 0 && typeof window.speechSynthesis.onvoiceschanged !== 'undefined') {
-          window.speechSynthesis.onvoiceschanged = function () {
-            chosen = pickBestVoice(lang);
-          };
         }
 
         playNext(0);
@@ -830,7 +841,9 @@
       bindPills('langBar', function (btn) {
         selectedLang = btn.getAttribute('data-lang') || 'darija';
       });
-      bindPills('levelBar');
+      bindPills('levelBar', function (btn) {
+        selectedLevel = btn.getAttribute('data-level') || 'تلقائي';
+      });
       bindPills('chapterBar');
 
       var logoClicks = 0;
@@ -930,13 +943,25 @@
           return {
             title: 'السؤال ' + index + ': ' + text,
             steps: [
-              'المعطيات والشرح: كان عندك مبلغ إجمالي ديال ' + total + ' درهم، واستعملتي/صرفتي منه ' + spent + ' درهم.',
-              'القاعدة والعملية: فاش كينقص مبلغ من مجموع، كنستعملو الطرح: ' + total + ' - ' + spent + ' = ' + rest,
-              'النتيجة النهائية: الباقي هو ' + rest + ' درهم.',
-              'التحقق: نجمعو الباقي مع اللي تصرف: ' + rest + ' + ' + spent + ' = ' + checkSum + ' درهم (مطابق للمعطيات).'
+              {
+                label: '1. فهم المسألة وشرح الفكرة',
+                detail: 'المسألة كتقول بلي كان عندك مبلغ كامل هو ' + total + ' درهم، ومن بعد نقصتي منه ' + spent + ' درهم. ملي كينقص شي حاجة من المجموع وكنبغيو نعرفو شحال بقى، القاعدة هي نديرو عملية الطرح.'
+              },
+              {
+                label: '2. تطبيق العملية خطوة بخطوة',
+                detail: 'كنشدو المبلغ الأول (' + total + ') وكنطرحو منه المبلغ اللي مشى (' + spent + '): ' + total + ' - ' + spent + ' = ' + rest + '.'
+              },
+              {
+                label: '3. النتيجة النهائية',
+                detail: 'المبلغ المتبقي هو ' + rest + ' درهم.'
+              },
+              {
+                label: '4. التحقق باش نضمنو الجواب صحيح',
+                detail: 'إلا جمعنا الباقي (' + rest + ') مع اللي صرفتي (' + spent + ') خاص يرجع لينا المجموع الأول: ' + rest + ' + ' + spent + ' = ' + checkSum + ' درهم. إذن الجواب مضبوط.'
+              }
             ],
-            speechAr: 'السؤال رقم ' + index + '. الشرح: كان لدينا ' + total + ' درهم، وصرفنا ' + spent + ' درهم. نطرح ' + spent + ' من ' + total + ' فنجد ' + rest + ' درهم. والتحقق: ' + rest + ' زائد ' + spent + ' يساوي ' + checkSum + '.',
-            speechFr: 'Question ' + index + '. Explication : vous avez ' + total + ' dirhams et vous dépensez ' + spent + ' dirhams. ' + total + ' moins ' + spent + ' égale ' + rest + '. Vérification : ' + rest + ' plus ' + spent + ' égale ' + checkSum + '.'
+            speechAr: 'مرحبا بك في شرح السؤال رقم ' + index + '. الفكرة هنا بسيطة: كان لدينا مبلغ إجمالي يساوي ' + total + ' درهم، واستعملنا منه ' + spent + ' درهم. لكي نعرف ما تبقى، نطرح ' + spent + ' من ' + total + ' فنحصل على ' + rest + ' درهم. ولنتأكد من صحة الحل، نجمع ' + rest + ' مع ' + spent + ' فنجد ' + checkSum + ' درهم وهو المبلغ الأصلي.',
+            speechFr: 'Voici l explication détaillée de la question ' + index + '. Vous avez un montant total de ' + total + ' dirhams et vous dépensez ' + spent + ' dirhams. Pour trouver ce qu il reste, on effectue la soustraction : ' + total + ' moins ' + spent + ' égale ' + rest + '. Pour vérifier, on additionne ' + rest + ' et ' + spent + ', ce qui redonne ' + checkSum + ' dirhams.'
           };
         }
 
@@ -953,33 +978,54 @@
           var finalConst = formatNum(d - b);
           var denom = parseFloat(finalXCoeff);
           var xVal = denom !== 0 ? formatNum(parseFloat(finalConst) / denom) : 'غير محدد';
-
-          var step1 = 'المعادلة الأصلية: ' + text;
-          var step2 = 'الشرح: نجمع الحدود اللي فيها x في الطرف الأيسر والأعداد في الطرف الأيمن مع تغيير الإشارة عند الانتقال: (' + a + ' - ' + c + ')x = ' + d + ' - (' + b + ')';
-          var step3 = 'التبسيط والحساب: ' + finalXCoeff + 'x = ' + finalConst + ' إذن x = ' + finalConst + ' / ' + finalXCoeff + ' = ' + xVal;
           var checkLeft = formatNum(a * parseFloat(xVal) + b);
           var checkRight = formatNum(c * parseFloat(xVal) + d);
-          var step4 = denom !== 0
-            ? 'التحقق: نعوض x بـ ' + xVal + ' في الطرفين، الطرف الأول = ' + checkLeft + ' والطرف الثاني = ' + checkRight + '.'
-            : 'التحقق: المعامل يساوي صفر، نراجع حدود المعادلة.';
 
           return {
             title: 'السؤال ' + index + ': ' + text,
-            steps: [step1, step2, step3, step4],
-            speechAr: 'السؤال رقم ' + index + '. نحل المعادلة ' + text + '. نجمع إكس في جهة والأعداد في جهة أخرى، فنحصل على ' + finalXCoeff + ' إكس يساوي ' + finalConst + '، إذن إكس يساوي ' + xVal + '. والتحقق يؤكد صحة النتيجة.',
-            speechFr: 'Question ' + index + '. Résolvons ' + text + '. On regroupe les termes en x d un côté et les constantes de l autre. On obtient ' + finalXCoeff + ' x égale ' + finalConst + ', donc x égale ' + xVal + '.'
+            steps: [
+              {
+                label: '1. شنو كنقصدو بحل المعادلة؟',
+                detail: 'الهدف ديالنا هو نلقاو القيمة ديال المجهول x اللي كتخلي الطرف اليسري ديال المعادلة يساوي الطرف الأيمن.'
+              },
+              {
+                label: '2. شرح جمع الحدود وعلاش كنبدلو الإشارة',
+                detail: 'كنجمعو الحدود اللي فيها x فـ جهة والأعداد بوحدها فـ جهة أخرى. أي حد نقلناه من جهة لجهة كنبدلو ليه الإشارة ديالو (+ كتولي - والعكس). هنا كنلقاو: (' + a + ' - ' + c + ')x = ' + d + ' - (' + b + ')، أي ' + finalXCoeff + 'x = ' + finalConst + '.'
+              },
+              {
+                label: '3. إخراج قيمة x والنتيجة النهائية',
+                detail: 'باش نبقاو غير مع x بوحدها، كنقسمو العدد (' + finalConst + ') على معامل x (' + finalXCoeff + '): x = ' + finalConst + ' / ' + finalXCoeff + ' = ' + xVal + '.'
+              },
+              {
+                label: '4. التحقق بالتعويض',
+                detail: denom !== 0
+                  ? 'كنعوضو x بـ ' + xVal + ' في المعادلة: الطرف الأول كيعطينا ' + checkLeft + ' والطرف الثاني كيعطينا ' + checkRight + '، يعني التساوي صحيح.'
+                  : 'المعامل يساوي صفر، خاص نراجع حدود المعادلة.'
+              }
+            ],
+            speechAr: 'نشرح الآن السؤال رقم ' + index + ' وهو المعادلة ' + text + '. الهدف هو إيجاد قيمة المجهول إكس. نجمع الحدود التي تحتوي على إكس في طرف والأعداد الثابتة في الطرف الآخر مع تغيير الإشارة عند الانتقال، فنصل إلى ' + finalXCoeff + ' إكس يساوي ' + finalConst + '. بعد ذلك نقسم على ' + finalXCoeff + ' فنجد أن إكس يساوي ' + xVal + '. وعند التحقق بتعويض القيمة نجد أن الطرفين متساويان.',
+            speechFr: 'Expliquons maintenant la question ' + index + ', l équation ' + text + '. L objectif est de trouver la valeur de x qui vérifie l égalité. On regroupe les termes en x d un côté et les nombres de l autre en changeant le signe lorsqu on déplace un terme. On obtient ' + finalXCoeff + ' x égale ' + finalConst + ', puis on divise par ' + finalXCoeff + ' pour trouver x égale ' + xVal + '. La vérification confirme que les deux côtés sont égaux.'
           };
         }
 
         return {
           title: 'السؤال ' + index + ': ' + text,
           steps: [
-            'المعطيات: ' + text,
-            'الشرح خطوة بخطوة: نحدد المطلوب بدقة ونطبق القاعدة المناسبة للدرس واللغة المختارة (' + selectedLang + ').',
-            'النتيجة والتحقق: نكتب النتيجة النهائية ونتأكد من صحتها ووحدتها.'
+            {
+              label: '1. قراءة المعطيات وفهم المطلوب',
+              detail: 'كنحددو شنو عاطينا فـ السؤال (' + text + ') وشنو كيطلب منا نلقاو بالضبط حسب المستوى (' + selectedLevel + ') ولغة الشرح (' + selectedLang + ').'
+            },
+            {
+              label: '2. شرح القاعدة والطريقة',
+              detail: 'كنختارو القاعدة ولا القانون المناسب للموضوع اللي كينتمي ليه السؤال، وكنطبقوه بترتيب باش ما نخلطوش الأرقام ولا الرموز.'
+            },
+            {
+              label: '3. النتيجة والتحقق',
+              detail: 'كنكتبو الجواب النهائي بوضوح مع الوحدة المناسبة وكنعاودو نراجعو الخطوات باش نتيقنو من الصحة.'
+            }
           ],
-          speechAr: 'السؤال رقم ' + index + '. نحدد المعطيات ونشرح خطوات الحل بوضوح ثم نتحقق من النتيجة النهائية.',
-          speechFr: 'Question ' + index + '. On analyse les données, on explique chaque étape clairement puis on vérifie le résultat.'
+          speechAr: 'نشرح السؤال رقم ' + index + '. أولاً نقرأ المعطيات جيداً ونفهم المطلوب، ثم نختار القاعدة المناسبة ونطبقها خطوة بخطوة مع شرح سبب كل خطوة، وفي النهاية نتحقق من صحة النتيجة.',
+          speechFr: 'Expliquons la question ' + index + '. D abord, on analyse les données et on identifie ce qui est demandé. Ensuite, on applique la règle adaptée étape par étape en expliquant chaque choix, puis on vérifie le résultat final.'
         };
       }
 
@@ -1017,12 +1063,19 @@
           return (
             '<div class="question-block">' +
               '<div class="question-heading">' + qBlock.title + '</div>' +
-              qBlock.steps.map(function (s) { return '<div class="step-item">' + s + '</div>'; }).join('') +
+              qBlock.steps.map(function (s) {
+                return (
+                  '<div class="step-item">' +
+                    '<span class="step-label">' + s.label + '</span>' +
+                    '<span>' + s.detail + '</span>' +
+                  '</div>'
+                );
+              }).join('') +
             '</div>'
           );
         }).join('');
 
-        lastSimpleExplanation = 'شرح مبسط: في المعادلات بحال 2x + 4 = 10، كنحيدو +4 من الجهة اليسرى ونديرو 10 - 4 = 6، ومن بعد 2x = 6 كتعطينا x = 6 / 2 = 3.';
+        lastSimpleExplanation = 'شرح مبسط جداً: تخيل عندك 10 دراهم وصرفتي 4 دراهم، كيبقاو ليك 6 دراهم. وفي المعادلات بحال 2x + 4 = 10، كنحيدو +4 من الجهة اليسرى وكنقصوها من 10، كيبقا 2x = 6، ومن بعد كنقسمو 6 على 2 وكنلقاو x = 3.';
         lastFullSpeechAr = solvedList.map(function (item) { return item.speechAr; }).join(' ');
         lastFullSpeechFr = solvedList.map(function (item) { return item.speechFr; }).join(' ');
 
