@@ -6,32 +6,31 @@
   <title>Math Solution</title>
   <style>
     :root {
-      --bg: #000000;
-      --card: #111111;
+      --bg: #050505;
+      --surface: #0f0f0f;
+      --surface-2: #171717;
       --text: #ffffff;
-      --muted: #b3b3b3;
+      --muted: #a3a3a3;
       --green: #00C853;
-      --green-text: #000000;
+      --green-dark: #00963f;
+      --yellow: #FFD600;
       --border: #262626;
-      --input-bg: #ffffff;
-      --input-text: #111111;
+      --textarea-bg: #121212;
+      --textarea-text: #ffffff;
     }
 
     body.light-mode {
-      --bg: #f5f5f5;
-      --card: #ffffff;
-      --text: #111111;
-      --muted: #555555;
-      --border: #dcdcdc;
-      --input-bg: #ffffff;
-      --input-text: #111111;
+      --bg: #f4f4f5;
+      --surface: #ffffff;
+      --surface-2: #e4e4e7;
+      --text: #09090b;
+      --muted: #52525b;
+      --border: #d4d4d8;
+      --textarea-bg: #ffffff;
+      --textarea-text: #09090b;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       background: var(--bg);
@@ -41,17 +40,8 @@
       min-height: 100vh;
     }
 
-    .ltr {
-      direction: ltr;
-      unicode-bidi: isolate;
-      text-align: left;
-    }
-
-    .rtl {
-      direction: rtl;
-      unicode-bidi: isolate;
-      text-align: right;
-    }
+    .ltr { direction: ltr; unicode-bidi: isolate; text-align: left; }
+    .rtl { direction: rtl; unicode-bidi: isolate; text-align: right; }
 
     /* Navbar */
     .navbar {
@@ -60,270 +50,404 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      padding: 14px 20px;
-      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
       background: var(--bg);
+      border-bottom: 1px solid var(--border);
       position: sticky;
       top: 0;
-      z-index: 20;
+      z-index: 50;
     }
 
-    .brand-group {
+    .nav-left, .nav-right {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 16px;
       flex-wrap: wrap;
     }
 
-    .brand-title {
-      font-size: 1.25rem;
-      font-weight: 800;
-      color: var(--text);
-      cursor: pointer;
-      user-select: none;
-    }
-
-    .mode-btn {
+    .btn-photo-nav {
       background: var(--green);
-      color: var(--green-text);
+      color: #000;
       border: none;
-      padding: 7px 14px;
-      border-radius: 8px;
+      padding: 8px 16px;
+      border-radius: 999px;
       font-weight: 700;
+      font-size: 0.9rem;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .nav-links {
       display: flex;
-      flex-wrap: wrap;
-      gap: 14px;
+      gap: 18px;
       font-size: 0.95rem;
     }
 
     .nav-links a {
       color: var(--text);
       text-decoration: none;
-      opacity: 0.9;
-    }
-
-    .nav-links a:hover {
-      color: var(--green);
-    }
-
-    /* Container */
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 28px 16px 60px;
-    }
-
-    .hero-title {
-      text-align: center;
-      font-size: 1.7rem;
-      font-weight: 800;
-      margin-bottom: 16px;
-    }
-
-    .green-banner {
-      background: var(--green);
-      color: #000000;
-      padding: 12px 16px;
-      border-radius: 10px;
-      font-weight: 700;
-      margin-bottom: 22px;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 8px;
-      text-align: center;
-    }
-
-    .section-label {
-      font-size: 0.92rem;
-      color: var(--muted);
-      margin-bottom: 8px;
       font-weight: 600;
     }
 
-    .pill-row {
+    .nav-links a:hover, .nav-links a.active { color: var(--green); }
+
+    .brand-logo {
+      font-size: 1.35rem;
+      font-weight: 900;
+      cursor: pointer;
+      user-select: none;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-logo span { color: var(--green); }
+
+    .mode-pill {
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Main Container */
+    .main-wrapper {
+      max-width: 820px;
+      margin: 24px auto 60px;
+      padding: 28px 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+    }
+
+    .sub-caption {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    /* Pill Selector Bars */
+    .bar-group {
       display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
+      justify-content: center;
       margin-bottom: 16px;
+    }
+
+    .pill-bar {
+      display: inline-flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 6px;
+      border-radius: 999px;
     }
 
     .pill-btn {
-      background: var(--card);
+      background: transparent;
       color: var(--text);
-      border: 1px solid var(--border);
-      padding: 8px 14px;
+      border: none;
+      padding: 8px 18px;
       border-radius: 999px;
-      cursor: pointer;
-      font-weight: 600;
+      font-weight: 700;
       font-size: 0.9rem;
+      cursor: pointer;
+      transition: 0.2s;
     }
 
     .pill-btn.active {
       background: var(--green);
       color: #000000;
-      border-color: var(--green);
     }
 
-    /* Main Solver Card */
-    .solver-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 18px;
-      margin-top: 12px;
+    .green-subtitle {
+      text-align: center;
+      color: var(--green);
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin: 12px 0 6px;
     }
 
-    .top-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
+    .hero-title {
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 900;
+      line-height: 1.3;
       margin-bottom: 14px;
     }
 
-    .action-green {
+    .badge-free {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 18px;
+    }
+
+    .badge-free span {
+      background: rgba(0, 200, 83, 0.12);
+      color: var(--green);
+      border: 1px solid var(--green);
+      padding: 6px 18px;
+      border-radius: 999px;
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+
+    /* Photo Action Row */
+    .photo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin: 18px 0;
+    }
+
+    @media (max-width: 600px) {
+      .photo-grid { grid-template-columns: 1fr; }
+    }
+
+    .btn-cam-big {
       background: var(--green);
-      color: #000000;
+      color: #000;
       border: none;
-      padding: 10px 16px;
-      border-radius: 8px;
-      font-weight: 700;
+      padding: 16px;
+      border-radius: 16px;
+      font-weight: 800;
+      font-size: 1.05rem;
       cursor: pointer;
+      text-align: center;
     }
 
-    .action-yellow {
-      background: #ffd600;
-      color: #000000;
-      border: none;
-      padding: 10px 16px;
-      border-radius: 8px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .action-dark {
-      background: #1f1f1f;
-      color: #ffffff;
-      border: 1px solid #383838;
-      padding: 10px 16px;
-      border-radius: 8px;
+    .btn-cam-big small, .btn-gal-big small {
+      display: block;
+      font-size: 0.78rem;
       font-weight: 600;
-      cursor: pointer;
+      opacity: 0.85;
     }
 
-    .box-header {
+    .btn-gal-big {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 16px;
+      border-radius: 16px;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    /* Dark Input Box */
+    .input-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .input-card-header {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-      font-size: 0.92rem;
+      font-size: 0.88rem;
       color: var(--muted);
+      margin-bottom: 10px;
+      font-weight: 600;
     }
 
-    textarea.exercise-input {
+    .dark-textarea {
       width: 100%;
       min-height: 110px;
-      background: var(--input-bg);
-      color: var(--input-text);
+      background: var(--textarea-bg);
+      color: var(--textarea-text);
       border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px;
+      border-radius: 12px;
+      padding: 14px;
       font-size: 1rem;
       resize: vertical;
+      outline: none;
     }
 
-    .submit-row {
+    .dark-textarea:focus { border-color: var(--green); }
+
+    .action-bottom-row {
       display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
+      gap: 12px;
       margin-top: 12px;
     }
 
-    .result-box {
-      margin-top: 18px;
-      padding: 16px;
-      border-radius: 10px;
+    .btn-solve-full {
+      flex: 1;
+      background: var(--green);
+      color: #000;
+      border: none;
+      padding: 14px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 1.05rem;
+      cursor: pointer;
+    }
+
+    .btn-example-yellow {
+      background: var(--yellow);
+      color: #000;
+      border: none;
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+
+    .status-line {
+      text-align: center;
+      color: var(--green);
+      font-size: 0.88rem;
+      font-weight: 700;
+      margin: 16px 0;
+    }
+
+    /* Solution Card */
+    .solution-card {
+      margin-top: 20px;
+      background: var(--bg);
       border: 1px solid var(--green);
-      background: rgba(0, 200, 83, 0.08);
+      border-radius: 16px;
+      padding: 20px;
+      display: none;
+      position: relative;
+    }
+
+    .solution-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+      margin-bottom: 14px;
+    }
+
+    .audio-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .btn-audio {
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--green);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .step-item {
+      margin-bottom: 10px;
+      padding: 10px 14px;
+      background: var(--surface);
+      border-radius: 10px;
+      border-right: 3px solid var(--green);
+    }
+
+    .reexplain-link {
+      display: inline-block;
+      margin-top: 12px;
+      color: var(--yellow);
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: underline;
+      font-size: 0.95rem;
+    }
+
+    .simple-box {
+      margin-top: 12px;
+      padding: 14px;
+      background: rgba(255, 214, 0, 0.1);
+      border: 1px solid var(--yellow);
+      border-radius: 10px;
       display: none;
     }
 
-    .footer-help {
-      margin-top: 32px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
+    /* Subscription / Owner Panels */
+    .sub-box, .owner-panel, .help-box {
+      margin-top: 20px;
       padding: 16px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
     }
 
-    .help-row {
+    .inline-form {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
       margin-top: 10px;
     }
 
-    .help-input {
+    .text-field {
       flex: 1;
-      min-width: 220px;
-      padding: 10px 12px;
-      border-radius: 8px;
+      min-width: 180px;
+      padding: 10px 14px;
+      border-radius: 10px;
       border: 1px solid var(--border);
-      background: var(--input-bg);
-      color: var(--input-text);
+      background: var(--surface);
+      color: var(--text);
     }
   </style>
 </head>
 <body>
+
+  <!-- Navbar -->
   <nav class="navbar">
-    <div class="brand-group">
-      <div class="brand-title" id="brandLogo">Math Solution</div>
-      <button type="button" class="mode-btn" id="modeToggle">Mode Clair</button>
+    <div class="nav-right">
+      <div class="brand-logo" id="secretOwnerTrigger"><span>Math</span> Solution</div>
+      <button type="button" class="mode-pill" id="modeToggle">Mode Clair ☀️</button>
     </div>
+
     <div class="nav-links">
-      <a href="#top">الرئيسية</a>
-      <a href="#subjects">المواضيع</a>
-      <a href="#history">السجل</a>
-      <a href="#photo">صور المسألة</a>
+      <a href="#top" class="active">الرئيسية</a>
+      <a href="#levels">المواضيع</a>
+      <a href="#solutionBox">السجل</a>
+    </div>
+
+    <div class="nav-left">
+      <button type="button" class="btn-photo-nav" onclick="document.getElementById('fileInput').click()">📷 صور المسألة</button>
     </div>
   </nav>
 
-  <main class="container" id="top">
-    <h1 class="hero-title" id="heroTitle">صوّر تمرين الرياضيات ولا كتبو، وخد الحل خطوة بخطوة مع التحقق النهائي</h1>
+  <!-- Main Container -->
+  <div class="main-wrapper" id="top">
+    <div class="sub-caption">اختر المادة الرئيسية - <span class="ltr">Choisissez la matière :</span></div>
 
-    <div class="green-banner">
-      <span class="rtl">5 أسئلة مجانية بلا كود -</span>
-      <span class="ltr">1ère, 2ème, 3ème année collège, Tronc Commun - الجذع المشترك, Tronc Commun Scientifique, 1ère et 2ème année Bac - résolution claire étape par étape avec vérification finale.</span>
-    </div>
-
-    <div id="subjects">
-      <div class="section-label">المادة</div>
-      <div class="pill-row" id="subjectButtons">
-        <button type="button" class="pill-btn active" data-subject="math">Mathématiques</button>
-        <button type="button" class="pill-btn" data-subject="physique">Physique</button>
-        <button type="button" class="pill-btn" data-subject="chimie">Chimie</button>
+    <!-- Subjects -->
+    <div class="bar-group">
+      <div class="pill-bar" id="subjectBar">
+        <button type="button" class="pill-btn active" data-subject="math">الرياضيات Mathématiques</button>
+        <button type="button" class="pill-btn" data-subject="physique">الفيزياء Physique</button>
+        <button type="button" class="pill-btn" data-subject="chimie">الكيمياء Chimie</button>
       </div>
     </div>
 
-    <div>
-      <div class="section-label">المستوى الدراسي</div>
-      <div class="pill-row ltr" id="levelButtons">
-        <button type="button" class="pill-btn active" data-level="1ère année collège">1ère année collège</button>
-        <button type="button" class="pill-btn" data-level="2ème année collège">2ème année collège</button>
-        <button type="button" class="pill-btn" data-level="3ème année collège">3ème année collège</button>
-        <button type="button" class="pill-btn" data-level="Tronc Commun - الجذع المشترك, Tronc Commun Scientifique">Tronc Commun - الجذع المشترك, Tronc Commun Scientifique</button>
-        <button type="button" class="pill-btn" data-level="1ère année Bac">1ère année Bac</button>
-        <button type="button" class="pill-btn" data-level="2ème année Bac">2ème année Bac</button>
-      </div>
+    <div class="green-subtitle">الإعدادي والتأهيلي • جميع المستويات • <span class="ltr">Collège & Lycée (1ère Collège -> 2ème Bac)</span></div>
+
+    <h1 class="hero-title" id="heroTitle">صوّر تمرين الرياضيات ولا كتبو، وخد الحل خطوة بخطوة مع التحقق</h1>
+
+    <div class="badge-free">
+      <span id="quotaBadge">5 أسئلة فابور بلا كود - لجميع مستويات الإعدادي والتأهيلي</span>
     </div>
 
-    <div>
-      <div class="section-label">اختر لغة الشرح</div>
-      <div class="pill-row" id="langButtons">
+    <!-- Languages -->
+    <div class="sub-caption">لغة الشرح :</div>
+    <div class="bar-group">
+      <div class="pill-bar" id="langBar">
         <button type="button" class="pill-btn active" data-lang="darija">بالدارجة</button>
         <button type="button" class="pill-btn" data-lang="ar">العربية الفصحى</button>
         <button type="button" class="pill-btn" data-lang="fr">Français</button>
@@ -331,127 +455,388 @@
       </div>
     </div>
 
-    <section class="solver-card" id="photo">
-      <div class="top-actions">
-        <button type="button" class="action-green" id="cameraBtn">Prendre une photo</button>
-        <button type="button" class="action-yellow" id="imageBtn">Choisir une image</button>
-        <button type="button" class="action-dark" id="examBtn">جبد الامتحان من التيليفون</button>
-        <input type="file" id="fileInput" accept="image/*" style="display:none" />
-      </div>
+    <!-- Photo Buttons -->
+    <div class="photo-grid">
+      <button type="button" class="btn-cam-big" id="camBtn">
+        📷 صوّر المسألة
+        <small class="ltr">Prendre une photo</small>
+      </button>
+      <button type="button" class="btn-gal-big" id="galBtn">
+        🖼️ طلع تصويرة من التيليفون
+        <small class="ltr">Choisir une image depuis le téléphone / Galerie</small>
+      </button>
+      <input type="file" id="fileInput" accept="image/*" style="display:none" />
+    </div>
 
-      <div class="box-header">
+    <!-- Dark Input Card -->
+    <div class="input-card">
+      <div class="input-card-header">
+        <span>✏️ ولا كتب التمرين هنا مباشرة</span>
         <span class="ltr">Écrire l'exercice</span>
-        <span class="rtl">ولا كتب التمرين هنا مباشرة ✏️</span>
       </div>
 
-      <textarea
-        id="exerciseInput"
-        class="exercise-input"
-        placeholder="مثال: عندي 50 درهم تريت كتاب ب 20 درهم شحال بقا ليا؟ أو 3x - 7 = 2x + 5"
-      ></textarea>
+      <textarea id="exerciseInput" class="dark-textarea" placeholder="مثال: عندي 50 درهم شريت كتاب ب 20 درهم شحال بقا ليا؟ أو 3x - 7 = 2x + 5"></textarea>
 
-      <div class="submit-row">
-        <button type="button" class="action-green" id="solveBtn">حل التمرين</button>
-        <button type="button" class="action-yellow" id="exampleBtn">جرب مثال</button>
+      <div class="action-bottom-row">
+        <button type="button" class="btn-solve-full" id="solveBtn">✈️ حل التمرين خطوة بخطوة</button>
+        <button type="button" class="btn-example-yellow" id="exampleBtn">✨ جرب مثال</button>
+      </div>
+    </div>
+
+    <div class="status-line" id="ownerStatusLine">الوضع المجاني: 5 أسئلة فاليوم لجميع المستويات</div>
+
+    <!-- Solution Display Box -->
+    <div class="solution-card" id="solutionBox">
+      <div class="solution-header">
+        <strong style="color:var(--green);">✅ الحل خطوة بخطوة مع التحقق النهائي</strong>
+        <div class="audio-controls">
+          <button type="button" class="btn-audio" onclick="speakSolution('ar')">🔊 اسمع الشرح بالعربية</button>
+          <button type="button" class="btn-audio" onclick="speakSolution('fr')">🔊 Écouter en Français</button>
+          <button type="button" class="btn-audio" onclick="window.speechSynthesis.cancel()">⏹️ إيقاف</button>
+        </div>
       </div>
 
-      <div class="result-box" id="resultBox"></div>
-    </section>
+      <div id="solutionSteps"></div>
 
-    <section class="footer-help" id="history">
-      <h3>عندك مشكل فالموقع؟</h3>
-      <div class="help-row">
-        <input type="text" id="issueInput" class="help-input" placeholder="اكتب المشكل ديالك هنا..." />
-        <button type="button" class="action-green" id="sendIssueBtn">صيفط المشكل</button>
+      <div class="reexplain-link" id="reexplainBtn">💡 لا مفهمتيش نزيد نشرح ليك</div>
+      <div class="simple-box" id="simpleExplainBox"></div>
+    </div>
+
+    <!-- Subscription Box (Shows when 5 free questions end) -->
+    <div class="sub-box" id="subBox" style="display:none; border-color: var(--yellow);">
+      <strong style="color:var(--yellow);">⚠️ ساليتي 5 أسئلة مجانية ديال اليوم!</strong>
+      <p style="font-size:0.9rem; margin-top:6px;">باش تكمل لمدة 30 يوم، دخل رقم الواتساب ديالك وكود التفعيل الشهري (MATH-XXXX-YYY):</p>
+      <div class="inline-form">
+        <input type="text" id="phoneInput" class="text-field" placeholder="رقم الهاتف (مثال: 0612345678)" />
+        <input type="text" id="codeInput" class="text-field ltr" placeholder="MATH-7392-678" />
+        <button type="button" class="btn-example-yellow" id="activateCodeBtn">تفعيل الاشتراك</button>
       </div>
-    </section>
-  </main>
+      <div style="margin-top:10px;">
+        <a href="https://wa.me/212679931143?text=%D8%B3%D9%84%D8%A7%D9%85%D8%8C%20%D8%A8%D8%BA%D9%8A%D8%AA%20%D9%83%D9%88%D8%AF%20%D8%A7%D9%84%D8%A7%D8%B4%D8%AA%D8%B1%D8%A7%D9%83%20%D8%A7%D9%84%D8%B4%D9%87%D8%B1%D9%8A%20Math%20Solution" target="_blank" style="color:var(--green); font-weight:700;">📲 طلب الكود فواتساب: 0679931143</a>
+      </div>
+    </div>
+
+    <!-- Hidden Owner Panel (Click Math Solution 3 times) -->
+    <div class="owner-panel" id="ownerLoginBox" style="display:none; border-color:var(--green);">
+      <strong>🔐 دخول مول الدار</strong>
+      <div class="inline-form">
+        <input type="password" id="ownerPassInput" class="text-field ltr" placeholder="Entrez le code secret..." />
+        <button type="button" class="btn-example-yellow" id="ownerUnlockBtn">دخول</button>
+      </div>
+    </div>
+
+    <!-- Levels & Chapters -->
+    <div id="levels" style="margin-top:24px;">
+      <div class="sub-caption">المستوى الدراسي - <span class="ltr">Niveau scolaire (Collège & Lycée)</span></div>
+      <div class="bar-group">
+        <div class="pill-bar" id="levelBar">
+          <button type="button" class="pill-btn active" data-level="تلقائي">تلقائي</button>
+          <button type="button" class="pill-btn" data-level="الأولى إعدادي">الأولى إعدادي</button>
+          <button type="button" class="pill-btn" data-level="الثانية إعدادي">الثانية إعدادي</button>
+          <button type="button" class="pill-btn" data-level="الثالثة إعدادي">الثالثة إعدادي</button>
+          <button type="button" class="pill-btn" data-level="الجذع المشترك">الجذع المشترك</button>
+          <button type="button" class="pill-btn" data-level="الأولى باك">الأولى باك</button>
+          <button type="button" class="pill-btn" data-level="الثانية باك">الثانية باك</button>
+        </div>
+      </div>
+
+      <div class="sub-caption">اختر المحور (اختياري) - <span class="ltr">Chapitre (optionnel)</span></div>
+      <div class="bar-group">
+        <div class="pill-bar" id="chapterBar">
+          <button type="button" class="pill-btn active" data-chap="تلقائي">تلقائي</button>
+          <button type="button" class="pill-btn" data-chap="المعادلات">المعادلات</button>
+          <button type="button" class="pill-btn" data-chap="الدوال">الدوال</button>
+          <button type="button" class="pill-btn" data-chap="المتتاليات">المتتاليات</button>
+          <button type="button" class="pill-btn" data-chap="الهندسة">الهندسة</button>
+          <button type="button" class="pill-btn" data-chap="الاحتمالات">الاحتمالات</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Help / WhatsApp Support -->
+    <div class="help-box">
+      <strong>عندك مشكل فالموقع؟ كتبو هنا</strong>
+      <div class="inline-form">
+        <input type="text" id="issueInput" class="text-field" placeholder="اكتب المشكل ديالك هنا..." />
+        <button type="button" class="btn-example-yellow" id="sendIssueBtn" style="background:var(--green);">صيفط المشكل فواتساب</button>
+      </div>
+    </div>
+  </div>
 
   <script>
     let selectedSubject = 'math';
-    let selectedLevel = '1ère année collège';
     let selectedLang = 'darija';
+    let selectedLevel = 'تلقائي';
+    let isOwner = localStorage.getItem('ms_owner') === 'true';
+    let isSubscribed = localStorage.getItem('ms_sub') === 'true';
+    let usedToday = parseInt(localStorage.getItem('ms_used') || '0', 10);
+    let lastSimpleExplanation = '';
+    let lastFullSpeechAr = '';
+    let lastFullSpeechFr = '';
 
-    const heroTitles = {
-      math: 'صوّر تمرين الرياضيات ولا كتبو، وخد الحل خطوة بخطوة مع التحقق النهائي',
-      physique: 'صوّر تمرين الفيزياء ولا كتبو، وخد الحل خطوة بخطوة مع التحقق النهائي',
-      chimie: 'صوّر تمرين الكيمياء ولا كتبو، وخد الحل خطوة بخطوة مع التحقق النهائي'
+    const titles = {
+      math: 'صوّر تمرين الرياضيات ولا كتبو، وخد الحل خطوة بخطوة مع التحقق',
+      physique: 'صوّر تمرين الفيزياء ولا كتبو، وخد الحل خطوة بخطوة مع التحقق',
+      chimie: 'صوّر تمرين الكيمياء ولا كتبو، وخد الحل خطوة بخطوة مع التحقق'
     };
 
-    const modeToggle = document.getElementById('modeToggle');
-    modeToggle.addEventListener('click', () => {
+    function updateStatusUI() {
+      const statusLine = document.getElementById('ownerStatusLine');
+      if (isOwner) {
+        statusLine.textContent = 'مرحبا مول الدار - الجهاز محفوظ، سكريفي على راحتك وأسئلة بلا حدود';
+      } else if (isSubscribed) {
+        statusLine.textContent = 'اشتراك الشهر مفعّل (30 يوم) - أسئلة بلا حدود';
+      } else {
+        const left = Math.max(0, 5 - usedToday);
+        statusLine.textContent = `باقي ليك ${left} من 5 أسئلة مجانية اليوم`;
+      }
+    }
+    updateStatusUI();
+
+    // Dark / Light Mode
+    document.getElementById('modeToggle').addEventListener('click', function () {
       document.body.classList.toggle('light-mode');
-      modeToggle.textContent = document.body.classList.contains('light-mode') ? 'Mode Sombre' : 'Mode Clair';
+      this.textContent = document.body.classList.contains('light-mode') ? 'Mode Sombre 🌙' : 'Mode Clair ☀️';
     });
 
-    function setupGroup(containerId, onSelect) {
-      const container = document.getElementById(containerId);
-      container.addEventListener('click', (e) => {
-        const btn = e.target.closest('button.pill-btn');
+    // Pill selection helper
+    function bindPills(barId, callback) {
+      const bar = document.getElementById(barId);
+      bar.addEventListener('click', (e) => {
+        const btn = e.target.closest('.pill-btn');
         if (!btn) return;
-        container.querySelectorAll('button.pill-btn').forEach(b => b.classList.remove('active'));
+        bar.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        onSelect(btn);
+        callback(btn);
       });
     }
 
-    setupGroup('subjectButtons', (btn) => {
+    bindPills('subjectBar', (btn) => {
       selectedSubject = btn.dataset.subject;
-      document.getElementById('heroTitle').textContent = heroTitles[selectedSubject];
+      document.getElementById('heroTitle').textContent = titles[selectedSubject];
     });
+    bindPills('langBar', (btn) => { selectedLang = btn.dataset.lang; });
+    bindPills('levelBar', (btn) => { selectedLevel = btn.dataset.level; });
+    bindPills('chapterBar', () => {});
 
-    setupGroup('levelButtons', (btn) => {
-      selectedLevel = btn.dataset.level;
-    });
-
-    setupGroup('langButtons', (btn) => {
-      selectedLang = btn.dataset.lang;
-    });
-
-    const exerciseInput = document.getElementById('exerciseInput');
-    const resultBox = document.getElementById('resultBox');
-
-    document.getElementById('exampleBtn').addEventListener('click', () => {
-      if (selectedSubject === 'math') {
-        exerciseInput.value = '3x - 7 = 2x + 5';
-      } else if (selectedSubject === 'physique') {
-        exerciseInput.value = 'd = 120 m, t = 20 s -> v = ?';
-      } else {
-        exerciseInput.value = 'H2 + O2 -> H2O';
+    // Secret Owner Trigger (3 clicks on Math Solution)
+    let logoClicks = 0;
+    document.getElementById('secretOwnerTrigger').addEventListener('click', () => {
+      logoClicks++;
+      if (logoClicks >= 3) {
+        document.getElementById('ownerLoginBox').style.display = 'block';
+        logoClicks = 0;
       }
     });
 
-    document.getElementById('solveBtn').addEventListener('click', () => {
-      const text = exerciseInput.value.trim();
-      resultBox.style.display = 'block';
-      if (!text) {
-        resultBox.innerHTML = '<div class="rtl">عاود كتب المسألة بهاد الشكل: عندي ... شريت ... شحال بقا ليا؟</div>';
+    document.getElementById('ownerUnlockBtn').addEventListener('click', () => {
+      const val = document.getElementById('ownerPassInput').value.trim().toLowerCase();
+      if (val === 'toufik legend') {
+        isOwner = true;
+        localStorage.setItem('ms_owner', 'true');
+        document.getElementById('ownerLoginBox').style.display = 'none';
+        document.getElementById('subBox').style.display = 'none';
+        updateStatusUI();
+        alert('مرحبا مول الدار! تم تفعيل الصلاحيات الكاملة.');
+      } else {
+        alert('كود غير صحيح');
+      }
+    });
+
+    // Subscription validation MATH-XXXX-YYY
+    document.getElementById('activateCodeBtn').addEventListener('click', () => {
+      const phone = document.getElementById('phoneInput').value.replace(/\D/g, '');
+      const code = document.getElementById('codeInput').value.trim().toUpperCase();
+      if (phone.length < 3) {
+        alert('دخل رقم الهاتف صحيح');
         return;
       }
-      resultBox.innerHTML = `
-        <div class="rtl"><strong>الواجهة مفعلة بنجاح</strong> — المادة المختارة: ${selectedSubject} | المستوى: ${selectedLevel} | اللغة: ${selectedLang}</div>
-        <div class="ltr" style="margin-top:8px;">Exercice: ${text.replace(/</g, '&lt;')}</div>
-        <div class="rtl" style="margin-top:8px;">التحقق النهائي: جاهز لربط محرك الحل خطوة بخطوة في المرحلة القادمة.</div>
-      `;
+      const last3 = phone.slice(-3);
+      const match = code.match(/^MATH-\d{4}-(\d{3})$/);
+      if (!match) {
+        alert('صيغة الكود خاصها تكون بحال: MATH-7392-' + last3);
+        return;
+      }
+      if (match[1] !== last3) {
+        alert('الكود لا يطابق رقم الهاتف');
+        return;
+      }
+      isSubscribed = true;
+      localStorage.setItem('ms_sub', 'true');
+      document.getElementById('subBox').style.display = 'none';
+      updateStatusUI();
+      alert('تم التفعيل بنجاح لمدة 30 يوم!');
     });
 
+    // Example Button
+    document.getElementById('exampleBtn').addEventListener('click', () => {
+      const input = document.getElementById('exerciseInput');
+      if (selectedSubject === 'math') {
+        input.value = '3x - 7 = 2x + 5';
+      } else if (selectedSubject === 'physique') {
+        input.value = 'd = 150 m, t = 30 s';
+      } else {
+        input.value = 'H2 + O2 -> H2O';
+      }
+    });
+
+    // Built-in Step-by-Step Solver
+    function solveExercise(raw) {
+      const text = raw.trim();
+
+      // 1. Darija word problem: عندي X ... شريت/خسرت Y
+      const darijaMatch = text.match(/عندي\s*(\d+(?:[.,]\d+)?).*?(?:شريت|خسرت|عطيت).*?(\d+(?:[.,]\d+)?)/);
+      if (selectedSubject === 'math' && darijaMatch) {
+        const total = parseFloat(darijaMatch[1].replace(',', '.'));
+        const spent = parseFloat(darijaMatch[2].replace(',', '.'));
+        const rest = total - spent;
+        return {
+          steps: [
+            `1) المعطيات: كان عندك ${total} درهم، وصرفتي ${spent} درهم.`,
+            `2) العملية: كنطرحو المبلغ اللي تصرف من المبلغ الأول: ${total} - ${spent}`,
+            `3) النتيجة: بقا ليك ${rest} درهم.`,
+            `4) التحقق النهائي (Vérification): ${rest} + ${spent} = ${total} درهم (صحيح ✅).`
+          ],
+          simple: `مثال ساهل بحالو: إلا كانو عندك 10 دراهم وشريتي حلوى ب 3 دراهم، كيبقاو ليك 10 ناقص 3 هي 7 دراهم.`,
+          speechAr: `أهلاً بك. المعطيات هي ${total} درهم، صرفنا منها ${spent} درهم. نديرو عملية الطرح: ${total} ناقص ${spent} كتساوي ${rest} درهم. للتحقق: ${rest} زائد ${spent} كتساوي ${total}.`,
+          speechFr: `Données: vous avez ${total} dirhams et vous dépensez ${spent} dirhams. Opération: ${total} moins ${spent} égale ${rest} dirhams. Vérification: ${rest} plus ${spent} égale ${total}.`
+        };
+      }
+
+      // 2. Linear Equation ax + b = cx + d
+      const eqMatch = text.replace(/\s+/g, '').match(/^([+-]?\d*)x([+-]\d+)?=([+-]?\d*)x([+-]\d+)?$/i);
+      if (selectedSubject === 'math' && eqMatch) {
+        const parseCoeff = (s) => (s === '' || s === '+') ? 1 : (s === '-' ? -1 : parseFloat(s));
+        const a = parseCoeff(eqMatch[1]);
+        const b = eqMatch[2] ? parseFloat(eqMatch[2]) : 0;
+        const c = parseCoeff(eqMatch[3]);
+        const d = eqMatch[4] ? parseFloat(eqMatch[4]) : 0;
+        const leftX = a - c;
+        const rightN = d - b;
+        const x = rightN / leftX;
+        return {
+          steps: [
+            `1) المعادلة الأصلية: ${text}`,
+            `2) نجمع المجاهيل x في طرف والأعداد في طرف: (${a} - ${c})x = ${d} - (${b})`,
+            `3) التبسيط: ${leftX}x = ${rightN}  =>  x = ${rightN} / ${leftX} = ${x}`,
+            `4) Vérification: نعوض x = ${x} في الطرفين فنجد نفس القيمة (${a * x + b} = ${c * x + d}) ✅`
+          ],
+          simple: `مثال ساهل: بحال 2x = 6، كنقسمو 6 على 2 وكنلقاو x = 3. ديما كنجمعو x فجيهة والأرقام فجيهة.`,
+          speechAr: `لحل المعادلة نجمع المجاهيل إكس في طرف والأعداد في طرف، فنجد ${leftX} إكس تساوي ${rightN}، إذن إكس تساوي ${x}. للتحقق نعوض فنجد طرفي المعادلة متساويين.`,
+          speechFr: `Pour résoudre l'équation, on regroupe les x d'un côté et les nombres de l'autre. On obtient ${leftX} x égale ${rightN}, donc x égale ${x}. Vérification confirmée.`
+        };
+      }
+
+      // 3. Physique
+      if (selectedSubject === 'physique') {
+        return {
+          steps: [
+            `1) Données : ${text}`,
+            `2) Formule : v = d / t (أو العلاقة المناسبة حسب المعطيات)`,
+            `3) Application numérique : تعويض المعطيات بالوحدات الدولية (m, s, kg, V, A)`,
+            `4) Résultat avec unité : النتيجة النهائية مرفوقة بالوحدة`,
+            `5) Vérification : مراجعة التجانس والوحدة ✅`
+          ],
+          simple: `مثال ساهل: إلا قطعتي 100 متر ف 10 ثواني، السرعة هي 100 مقسومة على 10 كتساوي 10 متر فالثانية.`,
+          speechAr: `في الفيزياء نبدأ بكتابة المعطيات، ثم العلاقة، ثم التطبيق العددي، والنتيجة بالوحدة، وأخيراً التحقق.`,
+          speechFr: `En physique, on suit toujours cinq étapes : Données, Formule, Application numérique, Résultat avec unité et Vérification.`
+        };
+      }
+
+      // 4. Chimie
+      if (selectedSubject === 'chimie') {
+        const balanced = text.includes('H2') && text.includes('O2') && text.includes('H2O')
+          ? '2 H₂ + O₂ → 2 H₂O'
+          : text;
+        return {
+          steps: [
+            `1) Equation équilibrée : ${balanced}`,
+            `2) Calcul étape par étape : موازنة عدد الذرات في المتفاعلات والنواتج`,
+            `3) Résultat avec unité : المعادلة متوازنة والنتيجة النهائية مضبوطة ✅`
+          ],
+          simple: `مثال ساهل: فـ H2 + O2 كتعطي H2O، خاصنا نفس عدد ذرات الهيدروجين والأكسجين قبل وبعد السهم، داكشي علاش كنكتبو 2 H2 + O2 تعطي 2 H2O.`,
+          speechAr: `في الكيمياء نبدأ بموازنة المعادلة الكيميائية، ثم الحساب خطوة بخطوة، ثم النتيجة بالوحدة.`,
+          speechFr: `En chimie, on commence par l'équation équilibrée, suivie du calcul étape par étape et du résultat avec unité.`
+        };
+      }
+
+      // Fallback guide
+      return {
+        steps: [
+          `عاود كتب المسألة بهاد الشكل: عندي ... شريت ... شحال بقا ليا؟`,
+          `أو كتب معادلة بحال: 3x - 7 = 2x + 5`
+        ],
+        simple: `جرب الضغط على الزر الأصفر "جرب مثال" باش تشوف طريقة الكتابة الصحيحة.`,
+        speechAr: `عاود كتب المسألة بهاد الشكل: عندي كذا، شريت كذا، شحال بقا ليا؟`,
+        speechFr: `Veuillez reformuler l'exercice ou cliquer sur le bouton exemple.`
+      };
+    }
+
+    document.getElementById('solveBtn').addEventListener('click', () => {
+      if (!isOwner && !isSubscribed && usedToday >= 5) {
+        document.getElementById('subBox').style.display = 'block';
+        document.getElementById('subBox').scrollIntoView({ behavior: 'smooth' });
+        return;
+      }
+
+      const text = document.getElementById('exerciseInput').value;
+      const res = solveExercise(text);
+
+      if (!isOwner && !isSubscribed) {
+        usedToday++;
+        localStorage.setItem('ms_used', String(usedToday));
+        updateStatusUI();
+      }
+
+      const stepsDiv = document.getElementById('solutionSteps');
+      stepsDiv.innerHTML = res.steps.map(s => `<div class="step-item">${s}</div>`).join('');
+      lastSimpleExplanation = res.simple;
+      lastFullSpeechAr = res.speechAr;
+      lastFullSpeechFr = res.speechFr;
+
+      document.getElementById('simpleExplainBox').style.display = 'none';
+      const box = document.getElementById('solutionBox');
+      box.style.display = 'block';
+      box.scrollIntoView({ behavior: 'smooth' });
+    });
+
+    document.getElementById('reexplainBtn').addEventListener('click', () => {
+      const sBox = document.getElementById('simpleExplainBox');
+      sBox.textContent = lastSimpleExplanation;
+      sBox.style.display = 'block';
+    });
+
+    function speakSolution(lang) {
+      if (!('speechSynthesis' in window)) {
+        alert('المتصفح لا يدعم القراءة الصوتية');
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(lang === 'fr' ? lastFullSpeechFr : lastFullSpeechAr);
+      utter.lang = lang === 'fr' ? 'fr-FR' : 'ar-SA';
+      utter.rate = 0.95;
+      window.speechSynthesis.speak(utter);
+    }
+
+    // Camera / Gallery handlers
     const fileInput = document.getElementById('fileInput');
-    document.getElementById('cameraBtn').addEventListener('click', () => {
+    document.getElementById('camBtn').addEventListener('click', () => {
       fileInput.setAttribute('capture', 'environment');
       fileInput.click();
     });
-    document.getElementById('imageBtn').addEventListener('click', () => {
+    document.getElementById('galBtn').addEventListener('click', () => {
       fileInput.removeAttribute('capture');
       fileInput.click();
     });
-    document.getElementById('examBtn').addEventListener('click', () => {
-      fileInput.removeAttribute('capture');
-      fileInput.click();
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files[0]) {
+        document.getElementById('exerciseInput').value = 'تم تحميل صورة التمرين: ' + e.target.files[0].name + ' — اكتب نص المعادلة أو اضغط حل التمرين';
+      }
     });
 
+    // WhatsApp Issue Reporter
     document.getElementById('sendIssueBtn').addEventListener('click', () => {
-      const issue = document.getElementById('issueInput').value.trim();
-      const msg = encodeURIComponent(issue || 'عندي مشكل فالموقع Math Solution');
+      const msg = encodeURIComponent(document.getElementById('issueInput').value.trim() || 'عندي مشكل فالموقع Math Solution');
       window.open(`https://wa.me/212679931143?text=${msg}`, '_blank', 'noopener,noreferrer');
     });
   </script>
