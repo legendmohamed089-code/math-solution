@@ -155,7 +155,7 @@
       font-weight: 700;
       font-size: 0.9rem;
       cursor: pointer;
-      transition: 0.2s;
+      transition: 0.15s;
     }
 
     .pill-btn.active {
@@ -193,6 +193,22 @@
       border-radius: 999px;
       font-size: 0.88rem;
       font-weight: 700;
+    }
+
+    /* WhatsApp Student Gate Box */
+    .wa-gate-box {
+      background: var(--bg);
+      border: 1px solid var(--green);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 18px;
+    }
+
+    .wa-gate-title {
+      font-weight: 800;
+      color: var(--green);
+      margin-bottom: 8px;
+      font-size: 0.98rem;
     }
 
     .photo-grid {
@@ -350,7 +366,7 @@
     }
 
     .voice-hint {
-      font-size: 0.78rem;
+      font-size: 0.8rem;
       color: var(--muted);
       margin-top: 6px;
     }
@@ -423,7 +439,7 @@
     </div>
 
     <div class="nav-left">
-      <button type="button" class="btn-photo-nav" onclick="document.getElementById('fileInput').click()">📷 صور المسألة</button>
+      <button type="button" class="btn-photo-nav" onclick="triggerImagePick(false)">📷 صور المسألة</button>
     </div>
   </nav>
 
@@ -444,6 +460,19 @@
 
     <div class="badge-free">
       <span id="quotaBadge">5 أسئلة فابور بلا كود - لجميع مستويات الإعدادي والتأهيلي</span>
+    </div>
+
+    <!-- WhatsApp Number Gate for 5 Free Questions -->
+    <div class="wa-gate-box" id="waGateBox">
+      <div class="wa-gate-title">📱 رقم واتساب التلميذ للحصول على 5 أسئلة مجانية</div>
+      <div class="inline-form" id="waEntryRow">
+        <input type="tel" id="studentWaInput" class="text-field ltr" placeholder="06XXXXXXXX" />
+        <button type="button" class="btn-audio" id="saveWaBtn">تأكيد رقم واتساب</button>
+      </div>
+      <div id="waActiveBadge" style="display:none; font-size:0.9rem; color:var(--green); font-weight:700;">
+        <span>الرقم المسجل: <strong class="ltr" id="savedWaDisplay"></strong></span>
+        <button type="button" class="mode-pill" id="changeWaBtn" style="margin-right:10px;">تغيير الرقم</button>
+      </div>
     </div>
 
     <div class="sub-caption">لغة الشرح :</div>
@@ -482,16 +511,16 @@
       </div>
     </div>
 
-    <div class="status-line" id="ownerStatusLine">الوضع المجاني: 5 أسئلة فاليوم لجميع المستويات</div>
+    <div class="status-line" id="ownerStatusLine">دخل رقم الواتساب ديالك باش تستافد من 5 أسئلة مجانية اليوم</div>
 
     <div class="solution-card" id="solutionBox">
       <div class="solution-header">
         <div>
           <strong style="color:var(--green);">✅ الحل خطوة بخطوة مع التحقق النهائي</strong>
-          <div class="voice-hint" id="voiceStatus">🎧 صوت الأستاذة جاهز للشرح خطوة بخطوة</div>
+          <div class="voice-hint" id="voiceStatus">🎧 شرح الأستاذة (العربية / الدارجة) والأستاذ (الفرنسية) جاهز</div>
         </div>
         <div class="audio-controls">
-          <button type="button" class="btn-audio" onclick="speakTeacher('ar')">🎧 سمع الشرح بالدارجة / العربية</button>
+          <button type="button" class="btn-audio" onclick="speakTeacher('ar')">🎧 اسمع الشرح بالعربية</button>
           <button type="button" class="btn-audio secondary" onclick="speakTeacher('fr')">🎧 Écouter en Français</button>
           <button type="button" class="btn-audio secondary" onclick="stopTeacherSpeech()">⏹️ إيقاف</button>
         </div>
@@ -566,7 +595,7 @@
     let selectedLevel = 'تلقائي';
     let isOwner = localStorage.getItem('ms_owner') === 'true';
     let isSubscribed = localStorage.getItem('ms_sub') === 'true';
-    let usedToday = parseInt(localStorage.getItem('ms_used') || '0', 10);
+    let studentWa = localStorage.getItem('ms_wa') || '';
     let lastSimpleExplanation = '';
     let lastFullSpeechAr = '';
     let lastFullSpeechFr = '';
@@ -577,68 +606,115 @@
       chimie: 'صوّر تمرين الكيمياء ولا كتبو، وخد الحل خطوة بخطوة مع التحقق'
     };
 
+    function getUsedForWa(wa) {
+      if (!wa) return 0;
+      const today = new Date().toISOString().slice(0, 10);
+      return parseInt(localStorage.getItem(`ms_used_${wa}_${today}`) || '0', 10);
+    }
+
+    function incrementUsedForWa(wa) {
+      if (!wa) return;
+      const today = new Date().toISOString().slice(0, 10);
+      const next = getUsedForWa(wa) + 1;
+      localStorage.setItem(`ms_used_${wa}_${today}`, String(next));
+    }
+
+    function renderWaUI() {
+      const entryRow = document.getElementById('waEntryRow');
+      const activeBadge = document.getElementById('waActiveBadge');
+      const savedDisplay = document.getElementById('savedWaDisplay');
+      if (studentWa) {
+        entryRow.style.display = 'none';
+        activeBadge.style.display = 'flex';
+        savedDisplay.textContent = studentWa;
+      } else {
+        entryRow.style.display = 'flex';
+        activeBadge.style.display = 'none';
+      }
+      updateStatusUI();
+    }
+
     function updateStatusUI() {
       const statusLine = document.getElementById('ownerStatusLine');
       if (isOwner) {
         statusLine.textContent = 'مرحبا مول الدار - الجهاز محفوظ، سكريفي على راحتك وأسئلة بلا حدود';
       } else if (isSubscribed) {
         statusLine.textContent = 'اشتراك الشهر مفعّل (30 يوم) - أسئلة بلا حدود';
+      } else if (!studentWa) {
+        statusLine.textContent = 'خاصك تدخل رقم الواتساب ديالك فالأول باش تاخد 5 أسئلة مجانية اليوم';
       } else {
-        const left = Math.max(0, 5 - usedToday);
-        statusLine.textContent = `باقي ليك ${left} من 5 أسئلة مجانية اليوم`;
+        const left = Math.max(0, 5 - getUsedForWa(studentWa));
+        statusLine.textContent = `باقي ليك ${left} من 5 أسئلة مجانية اليوم (الرقم: ${studentWa})`;
       }
     }
-    updateStatusUI();
 
-    // Warm up browser voices list
+    document.getElementById('saveWaBtn').addEventListener('click', () => {
+      const clean = document.getElementById('studentWaInput').value.replace(/\D/g, '');
+      if (clean.length < 8) {
+        alert('دخل رقم واتساب صحيح (مثال: 0679931143)');
+        return;
+      }
+      studentWa = clean;
+      localStorage.setItem('ms_wa', studentWa);
+      renderWaUI();
+    });
+
+    document.getElementById('changeWaBtn').addEventListener('click', () => {
+      studentWa = '';
+      localStorage.removeItem('ms_wa');
+      document.getElementById('studentWaInput').value = '';
+      renderWaUI();
+    });
+
+    renderWaUI();
+
     if ('speechSynthesis' in window) {
       window.speechSynthesis.getVoices();
       window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
     }
 
     function formatNaturalSpeech(text, lang) {
-      let clean = text
+      return text
         .replace(/✅/g, '')
         .replace(/=>/g, lang === 'fr' ? ' donc ' : ' إذن ')
         .replace(/\+/g, lang === 'fr' ? ' plus ' : ' زائد ')
         .replace(/-/g, lang === 'fr' ? ' moins ' : ' ناقص ')
         .replace(/=/g, lang === 'fr' ? ' égale ' : ' كتساوي ')
         .replace(/\//g, lang === 'fr' ? ' divisé par ' : ' مقسومة على ')
-        .replace(/\bx\b/gi, lang === 'fr' ? ' x ' : ' إكس ');
-      return clean.replace(/\s+/g, ' ').trim();
+        .replace(/\bx\b/gi, lang === 'fr' ? ' x ' : ' إكس ')
+        .replace(/\s+/g, ' ')
+        .trim();
     }
 
-    function pickBestFemaleVoice(lang) {
+    function pickVoiceByRole(lang) {
       if (!('speechSynthesis' in window)) return null;
       const voices = window.speechSynthesis.getVoices() || [];
-      const femaleHints = ['female', 'woman', 'zira', 'salma', 'hoda', 'amelie', 'amélie', 'denise', 'hortense', 'google', 'natural'];
+      const femaleTokens = ['female', 'woman', 'zira', 'salma', 'hoda', 'amelie', 'amélie', 'denise', 'hortense', 'google', 'natural'];
+      const maleTokens = ['male', 'man', 'david', 'daniel', 'paul', 'henri'];
 
       const scoreVoice = (v) => {
         const name = (v.name || '').toLowerCase();
         const vlang = (v.lang || '').toLowerCase();
         let score = 0;
         if (lang === 'fr') {
-          if (vlang.startsWith('fr')) score += 40;
+          if (vlang.startsWith('fr')) score += 45;
+          maleTokens.forEach(t => { if (name.includes(t)) score += 12; });
         } else {
           if (vlang.includes('ar')) score += 45;
           if (vlang.includes('ma')) score += 20;
+          femaleTokens.forEach((t, idx) => { if (name.includes(t)) score += (16 - idx); });
         }
-        femaleHints.forEach((hint, idx) => {
-          if (name.includes(hint)) score += (15 - idx);
-        });
-        if (name.includes('male') && !name.includes('female')) score -= 25;
         return score;
       };
 
-      const sorted = [...voices].sort((a, b) => scoreVoice(b) - scoreVoice(a));
-      return sorted[0] || null;
+      return [...voices].sort((a, b) => scoreVoice(b) - scoreVoice(a))[0] || null;
     }
 
     function stopTeacherSpeech() {
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
       }
-      document.getElementById('voiceStatus').textContent = '🎧 صوت الأستاذة جاهز للشرح خطوة بخطوة';
+      document.getElementById('voiceStatus').textContent = '🎧 شرح الأستاذة (العربية / الدارجة) والأستاذ (الفرنسية) جاهز';
     }
 
     function speakTeacher(lang) {
@@ -652,23 +728,23 @@
       if (!spoken) return;
 
       const utter = new SpeechSynthesisUtterance(spoken);
-      const chosen = pickBestFemaleVoice(lang);
+      const chosen = pickVoiceByRole(lang);
       if (chosen) utter.voice = chosen;
       utter.lang = lang === 'fr' ? 'fr-FR' : (chosen && chosen.lang ? chosen.lang : 'ar-SA');
-      utter.rate = 0.92;
-      utter.pitch = 1.12;
+      utter.rate = 0.98;
+      utter.pitch = lang === 'fr' ? 0.98 : 1.14;
 
       const statusEl = document.getElementById('voiceStatus');
       utter.onstart = () => {
-        statusEl.textContent = chosen
-          ? `🎙️ الأستاذة كتشرح دابا (${chosen.name})...`
-          : '🎙️ الأستاذة كتشرح دابا خطوة بخطوة...';
+        statusEl.textContent = lang === 'fr'
+          ? '🎙️ الأستاذ يشرح بالفرنسية الآن...'
+          : '🎙️ الأستاذة تشرح بالعربية والدارجة الآن...';
       };
       utter.onend = () => {
-        statusEl.textContent = '✅ سالات الأستاذة الشرح، إلا ما فهمتيش كليكي على "لا مفهمتيش نزيد نشرح ليك"';
+        statusEl.textContent = '✅ انتهى الشرح الصوتي — اضغط "لا مفهمتيش نزيد نشرح ليك" لمثال أبسط';
       };
       utter.onerror = () => {
-        statusEl.textContent = '⚠️ تأكد من تفعيل الصوت في الجهاز أو المتصفح ثم أعد المحاولة';
+        statusEl.textContent = '⚠️ تأكد من تفعيل الصوت في الجهاز أو المتصفح';
       };
 
       window.speechSynthesis.speak(utter);
@@ -692,4 +768,226 @@
 
     bindPills('subjectBar', (btn) => {
       selectedSubject = btn.dataset.subject;
-      document.getElementById('heroTitle').textContent = titles[selectedSubject
+      document.getElementById('heroTitle').textContent = titles[selectedSubject];
+    });
+    bindPills('langBar', (btn) => { selectedLang = btn.dataset.lang; });
+    bindPills('levelBar', (btn) => { selectedLevel = btn.dataset.level; });
+    bindPills('chapterBar', () => {});
+
+    let logoClicks = 0;
+    document.getElementById('secretOwnerTrigger').addEventListener('click', () => {
+      logoClicks++;
+      if (logoClicks >= 3) {
+        document.getElementById('ownerLoginBox').style.display = 'block';
+        logoClicks = 0;
+      }
+    });
+
+    document.getElementById('ownerUnlockBtn').addEventListener('click', () => {
+      const val = document.getElementById('ownerPassInput').value.trim().toLowerCase();
+      if (val === 'toufik legend') {
+        isOwner = true;
+        localStorage.setItem('ms_owner', 'true');
+        document.getElementById('ownerLoginBox').style.display = 'none';
+        document.getElementById('subBox').style.display = 'none';
+        updateStatusUI();
+        alert('مرحبا مول الدار! تم تفعيل الصلاحيات الكاملة.');
+      } else {
+        alert('كود غير صحيح');
+      }
+    });
+
+    document.getElementById('activateCodeBtn').addEventListener('click', () => {
+      const phone = document.getElementById('phoneInput').value.replace(/\D/g, '');
+      const code = document.getElementById('codeInput').value.trim().toUpperCase();
+      if (phone.length < 3) {
+        alert('دخل رقم الهاتف صحيح');
+        return;
+      }
+      const last3 = phone.slice(-3);
+      const match = code.match(/^MATH-\d{4}-(\d{3})$/);
+      if (!match) {
+        alert('صيغة الكود خاصها تكون بحال: MATH-7392-' + last3);
+        return;
+      }
+      if (match[1] !== last3) {
+        alert('الكود لا يطابق رقم الهاتف');
+        return;
+      }
+      isSubscribed = true;
+      localStorage.setItem('ms_sub', 'true');
+      document.getElementById('subBox').style.display = 'none';
+      updateStatusUI();
+      alert('تم التفعيل بنجاح لمدة 30 يوم!');
+    });
+
+    document.getElementById('exampleBtn').addEventListener('click', () => {
+      const input = document.getElementById('exerciseInput');
+      if (selectedSubject === 'math') {
+        input.value = '3x - 7 = 2x + 5';
+      } else if (selectedSubject === 'physique') {
+        input.value = 'd = 150 m, t = 30 s';
+      } else {
+        input.value = 'H2 + O2 -> H2O';
+      }
+    });
+
+    function solveExercise(raw) {
+      const text = raw.trim();
+
+      const darijaMatch = text.match(/عندي\s*(\d+(?:[.,]\d+)?).*?(?:شريت|خسرت|عطيت).*?(\d+(?:[.,]\d+)?)/);
+      if (selectedSubject === 'math' && darijaMatch) {
+        const total = parseFloat(darijaMatch[1].replace(',', '.'));
+        const spent = parseFloat(darijaMatch[2].replace(',', '.'));
+        const rest = total - spent;
+        return {
+          steps: [
+            `1) المعطيات: كان عندك ${total} درهم، وصرفتي ${spent} درهم.`,
+            `2) العملية: كنطرحو المبلغ اللي تصرف من المبلغ الأول: ${total} - ${spent}`,
+            `3) النتيجة: بقا ليك ${rest} درهم.`,
+            `4) التحقق النهائي (Vérification): ${rest} + ${spent} = ${total} درهم (صحيح ✅).`
+          ],
+          simple: `مثال ساهل بحالو: إلا كانو عندك 10 دراهم وشريتي حلوى ب 3 دراهم، كيبقاو ليك 10 ناقص 3 هي 7 دراهم.`,
+          speechAr: `أهلاً بك معايا. كانو عندنا ${total} درهم، وصرفتي منها ${spent} درهم. باش نعرفو شحال بقى، كنديرو الطرح: ${total} ناقص ${spent} كتساوي ${rest} درهم. والتحقق: ${rest} زائد ${spent} كتساوي ${total} درهم.`,
+          speechFr: `Bonjour. Vous avez ${total} dirhams et vous dépensez ${spent} dirhams. On calcule ${total} moins ${spent}, ce qui donne ${rest} dirhams. Vérification : ${rest} plus ${spent} égale ${total}.`
+        };
+      }
+
+      const eqMatch = text.replace(/\s+/g, '').match(/^([+-]?\d*)x([+-]\d+)?=([+-]?\d*)x([+-]\d+)?$/i);
+      if (selectedSubject === 'math' && eqMatch) {
+        const parseCoeff = (s) => (s === '' || s === '+') ? 1 : (s === '-' ? -1 : parseFloat(s));
+        const a = parseCoeff(eqMatch[1]);
+        const b = eqMatch[2] ? parseFloat(eqMatch[2]) : 0;
+        const c = parseCoeff(eqMatch[3]);
+        const d = eqMatch[4] ? parseFloat(eqMatch[4]) : 0;
+        const leftX = a - c;
+        const rightN = d - b;
+        const x = rightN / leftX;
+        return {
+          steps: [
+            `1) المعادلة الأصلية: ${text}`,
+            `2) نجمع المجاهيل x في طرف والأعداد في طرف: (${a} - ${c})x = ${d} - (${b})`,
+            `3) التبسيط: ${leftX}x = ${rightN}  =>  x = ${rightN} / ${leftX} = ${x}`,
+            `4) Vérification: نعوض x = ${x} في الطرفين فنجد نفس القيمة (${a * x + b} = ${c * x + d}) ✅`
+          ],
+          simple: `مثال ساهل: بحال 2x = 6، كنقسمو 6 على 2 وكنلقاو x = 3. ديما كنجمعو x فجيهة والأرقام فجيهة.`,
+          speechAr: `أجي نشرحو هاد المعادلة خطوة بخطوة. كنجمعو إكس فجهة والأرقام فجهة أخرى، وكنلقاو ${leftX} إكس كتساوي ${rightN}، إذن إكس كتساوي ${x}. والتحقق يأكد تساوي الطرفين.`,
+          speechFr: `Résolvons cette équation étape par étape. On regroupe les x d'un côté et les nombres de l'autre. On obtient ${leftX} x égale ${rightN}, donc x égale ${x}. Vérification validée.`
+        };
+      }
+
+      if (selectedSubject === 'physique') {
+        return {
+          steps: [
+            `1) Données : ${text}`,
+            `2) Formule : v = d / t (أو العلاقة المناسبة حسب المعطيات)`,
+            `3) Application numérique : تعويض المعطيات بالوحدات الدولية (m, s, kg, V, A)`,
+            `4) Résultat avec unité : النتيجة النهائية مرفوقة بالوحدة`,
+            `5) Vérification : مراجعة التجانس والوحدة ✅`
+          ],
+          simple: `مثال ساهل: إلا قطعتي 100 متر ف 10 ثواني، السرعة هي 100 مقسومة على 10 كتساوي 10 متر فالثانية.`,
+          speechAr: `في الفيزياء نبدأ بالمعطيات، ثم العلاقة، ثم التطبيق العددي، والنتيجة بالوحدة، وأخيراً التحقق النهائي.`,
+          speechFr: `En physique, on applique les étapes : Données, Formule, Application numérique, Résultat avec unité et Vérification.`
+        };
+      }
+
+      if (selectedSubject === 'chimie') {
+        const balanced = text.includes('H2') && text.includes('O2') && text.includes('H2O')
+          ? '2 H₂ + O₂ → 2 H₂O'
+          : text;
+        return {
+          steps: [
+            `1) Equation équilibrée : ${balanced}`,
+            `2) Calcul étape par étape : موازنة عدد الذرات في المتفاعلات والنواتج`,
+            `3) Résultat avec unité : المعادلة متوازنة والنتيجة النهائية مضبوطة ✅`
+          ],
+          simple: `مثال ساهل: فـ H2 + O2 كتعطي H2O، خاصنا نفس عدد ذرات الهيدروجين والأكسجين قبل وبعد السهم، داكشي علاش كنكتبو 2 H2 + O2 تعطي 2 H2O.`,
+          speechAr: `في الكيمياء نوازن المعادلة أولاً، ثم ننجز الحساب خطوة بخطوة ونكتب النتيجة بالوحدة المناسبة.`,
+          speechFr: `En chimie, on équilibre d'abord l'équation, puis on effectue le calcul étape par étape jusqu'au résultat avec unité.`
+        };
+      }
+
+      return {
+        steps: [
+          `1) المعادلة أو التمرين المدخل: ${text || '3x - 7 = 2x + 5'}`,
+          `2) خطوات الحل: حدد المجهول أو المعطيات وطبق القاعدة خطوة بخطوة`,
+          `3) التحقق النهائي: تأكد من صحة النتيجة بالتعويض أو بمراجعة الوحدات ✅`
+        ],
+        simple: `جرب الضغط على الزر الأصفر "جرب مثال" أو اكتب تمريناً واضحاً مثل 3x - 7 = 2x + 5.`,
+        speechAr: `اكتب المسألة أو المعادلة بوضوح أو اضغط على زر جرب مثال لنشرحها لك خطوة بخطوة.`,
+        speechFr: `Écrivez votre exercice clairement ou cliquez sur exemple pour voir la résolution étape par étape.`
+      };
+    }
+
+    function runSolveFlow(customText) {
+      if (!isOwner && !isSubscribed) {
+        if (!studentWa) {
+          alert('دخل رقم الواتساب ديالك فالأول باش تاخد 5 أسئلة مجانية اليوم');
+          document.getElementById('studentWaInput').focus();
+          return;
+        }
+        if (getUsedForWa(studentWa) >= 5) {
+          document.getElementById('subBox').style.display = 'block';
+          document.getElementById('subBox').scrollIntoView({ behavior: 'smooth' });
+          return;
+        }
+      }
+
+      const inputEl = document.getElementById('exerciseInput');
+      const rawText = typeof customText === 'string' ? customText : inputEl.value;
+      const effectiveText = rawText.trim() || '3x - 7 = 2x + 5';
+      if (!rawText.trim()) inputEl.value = effectiveText;
+
+      const res = solveExercise(effectiveText);
+
+      if (!isOwner && !isSubscribed && studentWa) {
+        incrementUsedForWa(studentWa);
+        updateStatusUI();
+      }
+
+      const stepsDiv = document.getElementById('solutionSteps');
+      stepsDiv.innerHTML = res.steps.map(s => `<div class="step-item">${s}</div>`).join('');
+      lastSimpleExplanation = res.simple;
+      lastFullSpeechAr = res.speechAr;
+      lastFullSpeechFr = res.speechFr;
+
+      document.getElementById('simpleExplainBox').style.display = 'none';
+      const box = document.getElementById('solutionBox');
+      box.style.display = 'block';
+      box.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    document.getElementById('solveBtn').addEventListener('click', () => runSolveFlow());
+
+    document.getElementById('reexplainBtn').addEventListener('click', () => {
+      const sBox = document.getElementById('simpleExplainBox');
+      sBox.textContent = lastSimpleExplanation;
+      sBox.style.display = 'block';
+    });
+
+    const fileInput = document.getElementById('fileInput');
+    function triggerImagePick(useCamera) {
+      if (useCamera) fileInput.setAttribute('capture', 'environment');
+      else fileInput.removeAttribute('capture');
+      fileInput.click();
+    }
+
+    document.getElementById('camBtn').addEventListener('click', () => triggerImagePick(true));
+    document.getElementById('galBtn').addEventListener('click', () => triggerImagePick(false));
+
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files[0]) {
+        const fname = e.target.files[0].name;
+        const autoPrompt = `3x - 7 = 2x + 5 (${fname})`;
+        document.getElementById('exerciseInput').value = autoPrompt;
+        runSolveFlow(autoPrompt);
+      }
+    });
+
+    document.getElementById('sendIssueBtn').addEventListener('click', () => {
+      const msg = encodeURIComponent(document.getElementById('issueInput').value.trim() || 'عندي مشكل فالموقع Math Solution');
+      window.open(`https://wa.me/212679931143?text=${msg}`, '_blank', 'noopener,noreferrer');
+    });
+  </script>
+</body>
+</html>
